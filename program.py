@@ -27,29 +27,32 @@ class program():
             'peca_grandnmet': False,
             'peca_grandmet': False
         }
+        self.start = False
         self.ip = ip
 
     def run(self):
-        self.running = True
         client = modbus.ModbusTcpClient(self.ip)
 
         client.connect()
 
         F1 = False
 
-        liga_esteira = modbus.read_coil_call(client, 0)
-        anvanca_ap1 = modbus.read_coil_call(client, 2)
-        anvanca_ap2 = modbus.read_coil_call(client, 3)
-        fc_1 = modbus.read_coil_call(client, 14)
-        fc_2 = modbus.read_coil_call(client, 15)
-        fc_3 = modbus.read_coil_call(client, 16)
-        fc_4 = modbus.read_coil_call(client, 17)
-        peca_peqnmet = modbus.read_coil_call(client, 20)
-        peca_peqmet = modbus.read_coil_call(client, 21)
-        peca_mednmet = modbus.read_coil_call(client, 22)
-        peca_medmet = modbus.read_coil_call(client, 23)
-        peca_grdnmet = modbus.read_coil_call(client, 24)
-        peca_grdmet = modbus.read_coil_call(client, 25)
+        liga_esteira = modbus.write_coil_call(client, 0, False)
+        anvanca_ap1 = modbus.write_coil_call(client, 2, False)
+        anvanca_ap2 = modbus.write_coil_call(client, 3, False)
+        #fc_1 = modbus.write_coil_call(client, 14, False)
+        #fc_2 = modbus.write_coil_call(client, 15, False)
+        #fc_3 = modbus.write_coil_call(client, 16, False)
+        #fc_4 = modbus.write_coil_call(client, 17, False)
+        peca_peqnmet = modbus.write_coil_call(client, 20, False)
+        peca_peqmet = modbus.write_coil_call(client, 21, False)
+        peca_mednmet = modbus.write_coil_call(client, 22, False)
+        peca_medmet = modbus.write_coil_call(client, 23, False)
+        peca_grdnmet = modbus.write_coil_call(client, 24, False)
+        peca_grdmet = modbus.write_coil_call(client, 25, False)
+
+        while not self.start:
+            time.sleep(1)
 
         data = {'domain': open('./domain.pddl', 'r').read(),
                 'problem': open('./problem.pddl', 'r').read()}
@@ -288,4 +291,5 @@ class program():
 
 if __name__ == "__main__":
     app = program("127.0.0.1")
+    app.start = True
     app.run()

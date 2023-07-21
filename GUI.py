@@ -196,7 +196,7 @@ class GUI:
         frame8 = tk.Frame(self.frame23)
         frame8.configure(height=200, width=200)
         button5 = tk.Button(frame8)
-        button5.configure(text='Iniciar')
+        button5.configure(text='Iniciar',command=self.iniciar)
         button5.pack(side="top")
         button6 = tk.Button(frame8)
         button6.configure(text='Parar/Reprogramar')
@@ -254,6 +254,9 @@ class GUI:
         self.instance = ThreadClient(entered_value)
         self.instance.start()
         self.table = self.instance.prog.table
+
+    def iniciar(self):
+        self.instance.prog.start = True
 
 
     def update(self):
