@@ -1,3 +1,3 @@
 # CLP-API
-## Installation
-run install.bat
+## Usage
+Start run.bat
