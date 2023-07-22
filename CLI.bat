@@ -1,4 +1,3 @@
 py -m venv env
-call .\env\Scripts\activate.bat
-pip install -r requirements.txt
-.\program.py
+.env/Scripts/pip install -r requirements.txt
+.env/Scripts/python gui.py
