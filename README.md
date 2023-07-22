@@ -1,5 +1,5 @@
 # CLP-API
-## requirements
+## Requirements
 Python 3.10.7
 
 ## Usage
