@@ -262,6 +262,10 @@ class GUI:
         self.instance.start()
         self.table = self.instance.prog.table
 
+    def desconectar(self):
+        self.running = False
+        self.instance.prog.state = False
+
     def iniciar(self):
         self.generate_problem()
         self.instance.prog.start = True

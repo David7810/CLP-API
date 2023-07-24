@@ -16,28 +16,8 @@ def generate_problemFile(items):
     lines = []
     # Parse the file into lines
 
-    items = {
-        'cx2_peq_metal': 0,
-        'cx2_med_metal': 0,
-        'cx2_grd_metal': 0,
-        'cx2_peq': 0,
-        'cx2_med': 0,
-        'cx2_grd': 0,
-
-        'cx1_peq_metal': 1,
-        'cx1_med_metal': 1,
-        'cx1_grd_metal': 0,
-        'cx1_peq': 0,
-        'cx1_med': 0,
-        'cx1_grd': 0,
-
-        'cx3_peq_metal': 1,
-        'cx3_med_metal': 0,
-        'cx3_grd_metal': 0,
-        'cx3_peq': 0,
-        'cx3_med': 0,
-        'cx3_grd': 0
-    }
+    for keys in items:
+        items[keys] = int(items[keys])
 
     n_box1 = items['cx1_peq_metal'] + items['cx1_med_metal'] + items['cx1_grd_metal'] + items['cx1_peq'] + items[
         'cx1_med'] + items['cx1_grd']
@@ -48,7 +28,7 @@ def generate_problemFile(items):
 
     n_peq_metal = items['cx1_peq_metal'] + items['cx2_peq_metal'] + items['cx3_peq_metal']
     n_med_metal = items['cx1_med_metal'] + items['cx2_med_metal'] + items['cx3_med_metal']
-    n_grd_metal = items['cx1_grd_metal'] + items['cx2_grd_metal'] + items['cx2_grd_metal']
+    n_grd_metal = items['cx1_grd_metal'] + items['cx2_grd_metal'] + items['cx3_grd_metal']
 
     n_peq = items['cx1_peq'] + items['cx2_peq'] + items['cx3_peq']
     n_med = items['cx1_med'] + items['cx2_med'] + items['cx3_med']
@@ -141,13 +121,13 @@ def generate_problemFile(items):
                         case 'cx1_med':
                             for x in range(items['cx1_med']):
                                 val_list = list(tipo_items.values())
-                                position = val_list.index('medmet')
+                                position = val_list.index('mednmet')
                                 tipo_items[key_list[position]] = 'box1'
 
                         case 'cx1_grd':
                             for x in range(items['cx1_grd']):
                                 val_list = list(tipo_items.values())
-                                position = val_list.index('grdmet')
+                                position = val_list.index('grdnmet')
                                 tipo_items[key_list[position]] = 'box1'
 
                         case 'cx2_peq_metal':
@@ -177,13 +157,13 @@ def generate_problemFile(items):
                         case 'cx2_med':
                             for x in range(items['cx2_med']):
                                 val_list = list(tipo_items.values())
-                                position = val_list.index('medmet')
+                                position = val_list.index('mednmet')
                                 tipo_items[key_list[position]] = 'box2'
 
                         case 'cx2_grd':
                             for x in range(items['cx2_grd']):
                                 val_list = list(tipo_items.values())
-                                position = val_list.index('grdmet')
+                                position = val_list.index('grdnmet')
                                 tipo_items[key_list[position]] = 'box2'
 
                         case 'cx3_peq_metal':
@@ -213,13 +193,13 @@ def generate_problemFile(items):
                         case 'cx3_med':
                             for x in range(items['cx3_med']):
                                 val_list = list(tipo_items.values())
-                                position = val_list.index('medmet')
+                                position = val_list.index('mednmet')
                                 tipo_items[key_list[position]] = 'box3'
 
                         case 'cx3_grd':
                             for x in range(items['cx3_grd']):
                                 val_list = list(tipo_items.values())
-                                position = val_list.index('grdmet')
+                                position = val_list.index('grdnmet')
                                 tipo_items[key_list[position]] = 'box3'
 
                 # for x in range(n_box1):
@@ -232,3 +212,4 @@ def generate_problemFile(items):
     # Write them back to the file
     with open('problem.pddl', 'w') as f:
         f.writelines(lines)
+
