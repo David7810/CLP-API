@@ -2,5 +2,5 @@
 ## Requirements
 Python 3.10.7
 
-## Usage
+## Installation
 Start run.bat
