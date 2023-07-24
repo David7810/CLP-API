@@ -1,6 +1,9 @@
 #!/usr/bin/python3
 
 import sys
+
+import functions
+
 sys.path.insert(0, './Lib/site-packages')
 
 import tkinter as tk
@@ -14,6 +17,9 @@ class ThreadClient(threading.Thread):
         self.prog = program(ip)
     def run(self):
         self.prog.run()
+    #def stop(self):
+    #    self._stop_event.set()
+
 
 
 class GUI:
@@ -200,10 +206,10 @@ class GUI:
         button5.configure(text='Iniciar',command=self.iniciar)
         button5.pack(side="top")
         button6 = tk.Button(frame8)
-        button6.configure(text='Parar/Reprogramar')
+        button6.configure(text='Parar/Reprogramar', command=self.parar)
         button6.pack(side="top")
         button7 = tk.Button(frame8)
-        button7.configure(text='Desconectar')
+        button7.configure(text='Desconectar', command=self.desconectar)
         button7.pack(side="top")
         frame8.grid(column=3, padx=40, row=1)
         label24 = tk.Label(self.frame23)
@@ -257,11 +263,46 @@ class GUI:
         self.table = self.instance.prog.table
 
     def iniciar(self):
+        self.generate_problem()
         self.instance.prog.start = True
         self.running = True
 
+    def parar(self):
+        self.running = False
+        self.instance.prog.state = False
+        self.conectar()
+        #self.instance.
+
+    def desconectar(self):
+        self.running = False
+        self.instance.prog.state = False
+
     def generate_problem(self):
-        self.spinbox1.getvar()
+
+        items = {
+            'cx2_peq_metal' : self.spinbox1.get(),
+            'cx2_med_metal' : self.spinbox2.get(),
+            'cx2_grd_metal' : self.spinbox3.get(),
+            'cx2_peq' : self.spinbox4.get(),
+            'cx2_med' : self.spinbox5.get(),
+            'cx2_grd' : self.spinbox6.get(),
+
+            'cx1_peq_metal' : self.spinbox7.get(),
+            'cx1_med_metal' : self.spinbox8.get(),
+            'cx1_grd_metal' : self.spinbox9.get(),
+            'cx1_peq' : self.spinbox10.get(),
+            'cx1_med' : self.spinbox11.get(),
+            'cx1_grd' : self.spinbox12.get(),
+
+            'cx3_peq_metal' : self.spinbox13.get(),
+            'cx3_med_metal' : self.spinbox14.get(),
+            'cx3_grd_metal' : self.spinbox15.get(),
+            'cx3_peq' : self.spinbox16.get(),
+            'cx3_med' : self.spinbox17.get(),
+            'cx3_grd' : self.spinbox18.get()
+        }
+
+        functions.generate_problemFile(items)
 
 
     def update(self):

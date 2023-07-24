@@ -29,6 +29,7 @@ class program():
         }
         self.start = False
         self.ip = ip
+        self.state = True
 
     def run(self):
         self.client = modbus.ModbusTcpClient(self.ip)
@@ -53,6 +54,8 @@ class program():
         peca_grdmet = modbus.write_coil_call(self.client, 25, False)
 
         while not self.start:
+            if not self.state:
+                return 0
             time.sleep(1)
 
         data = {'domain': open('./domain.pddl', 'r').read(),
@@ -206,6 +209,8 @@ class program():
 
 
             while not precondition_met:
+                if not self.state:
+                    return 0
                 self.table['liga_esteira'] = modbus.read_coil_call(self.client, 0)
                 self.table['anvanca_ap1'] = modbus.read_coil_call(self.client, 1)
                 self.table['anvanca_ap2'] = modbus.read_coil_call(self.client, 2)
@@ -235,7 +240,8 @@ class program():
                 print('-------')
 
             while not effect_met:
-
+                if not self.state:
+                    return 0
                 if 'liga_esteira' in effect_dict:
                     modbus.write_coil_call(self.client, 0, effect_dict['liga_esteira'])
 
