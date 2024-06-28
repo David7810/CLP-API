@@ -1,48 +1,48 @@
 #!/usr/bin/python3
 
 import sys
-
 import functions
+import tkinter as tk
+import tkinter.ttk as ttk
+from LogicLoop import LogicLoop
+import threading
 
 sys.path.insert(0, './Lib/site-packages')
 
-import tkinter as tk
-import tkinter.ttk as ttk
-from program import program
-import threading
 
 class ThreadClient(threading.Thread):
-    def __init__(self,ip):
+    def __init__(self, ip):
         threading.Thread.__init__(self)
-        self.prog = program(ip)
+        self.prog = LogicLoop()
+        self.ip = ip
     def run(self):
-        self.prog.run()
+        self.prog.run(self.ip)
     #def stop(self):
     #    self._stop_event.set()
-
 
 
 class GUI:
 
     def __init__(self, master=None):
 
-        self.table = {
-            'liga_esteira': False,
-            'anvanca_ap1': False,
-            'anvanca_ap2': False,
-            'anvanca_ap3': False,
-            'retrai_ap3': False,
-            'fc_1': False,
-            'fc_2': False,
-            'fc_3': False,
-            'fc_4': False,
-            'peca_peqnmet': False,
-            'peca_peqmet': False,
-            'peca_mednmet': False,
-            'peca_medmet': False,
-            'peca_grandnmet': False,
-            'peca_grandmet': False
-        }
+        self.instance = None
+        #self.table = {
+        #    'liga_esteira': False,
+        #    'anvanca_ap1': False,
+        #    'anvanca_ap2': False,
+        #    'anvanca_ap3': False,
+        #    'retrai_ap3': False,
+        #    'fc_1': False,
+        #    'fc_2': False,
+        #    'fc_3': False,
+        #    'fc_4': False,
+        #    'peca_peqnmet': False,
+        #    'peca_peqmet': False,
+        #    'peca_mednmet': False,
+        #    'peca_medmet': False,
+        #    'peca_grandnmet': False,
+        #    'peca_grandmet': False
+        #}
 
         self.running = False
 
@@ -251,8 +251,10 @@ class GUI:
         self.frame1.tkraise()
         self.mainwindow = toplevel1
 
-    def run(self):
+        #Atualiza imediatamente os valores da interface apos a janela ser aberta
         self.mainwindow.after(0, self.update)
+
+        #Inicia o loop
         self.mainwindow.mainloop()
 
     def conectar(self):
@@ -260,15 +262,17 @@ class GUI:
         print(entered_value)
         self.instance = ThreadClient(entered_value)
         self.instance.start()
-        self.table = self.instance.prog.table
+        #self.table = self.instance.prog.table
 
     def desconectar(self):
         self.running = False
-        self.instance.prog.state = False
+        #self.instance.prog.state = False
+        self.instance.prog.pause()
 
     def iniciar(self):
         self.generate_problem()
         self.instance.prog.start = True
+        #self.instance.prog.start1()
         self.running = True
 
     def parar(self):
@@ -282,7 +286,7 @@ class GUI:
         self.instance.prog.state = False
 
     def generate_problem(self):
-
+        #Armazena as informacoes sobre o problema desejado
         items = {
             'cx2_peq_metal' : self.spinbox1.get(),
             'cx2_med_metal' : self.spinbox2.get(),
@@ -306,9 +310,10 @@ class GUI:
             'cx3_grd' : self.spinbox18.get()
         }
 
+        #Gera a descricao do problema
         functions.generate_problemFile(items)
 
-
+    #Atualiza a interface
     def update(self):
         if self.running:
             self.spinbox1.configure(state=tk.DISABLED)
@@ -349,12 +354,8 @@ class GUI:
             self.spinbox17.configure(state=tk.NORMAL)
             self.spinbox18.configure(state=tk.NORMAL)
 
-
-
-
-
-        if hasattr(self, 'instance'):
-            if(self.instance.is_alive()):
+        if self.instance is not None:
+            if self.instance.is_alive():
                 if self.instance.prog.client.connected:
                     self.frame2.tkraise()
                 else:
@@ -368,12 +369,12 @@ class GUI:
             #case True: self.label32.configure(background='green')
             #case False: self.label32.configure(background='red')
 
+        #A cada 200 ms atualiza as informacoes na janela
         self.mainwindow.after(200, self.update)
 
-
+        print(f"Thread ID: {threading.enumerate()}")
 
 
 
 if __name__ == "__main__":
     app = GUI()
-    app.run()
