@@ -42,8 +42,11 @@
 
     ;; desligar a esteira
     (:action desligar_esteira
-        :parameters (?e - esteira)
+        :parameters (?e - esteira ?a1 - atuador_simples1 ?a2 - atuador_simples2 ?a3 - atuador_duplo1)
         :precondition (and
+            (not (extended ?a1))
+            (not (extended ?a2))
+            (not (extended ?a3))
             (ligado ?e)
         )
         :effect (and
