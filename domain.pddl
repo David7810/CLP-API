@@ -1,52 +1,33 @@
 (define (domain sorting)
     (:requirements :typing)
 
-    ;; type of object
-    (:types esteira caracteristica
-        item atuador - locatable
-        atuador_duplo atuador_simples - atuador
-        inicio fim - location
-        location
-        ;;incio box - location
-
+    (:types
+        ;; tipos de objetos
+        atuador_simples1 atuador_simples2 atuador_duplo1 - atuador
+        grdmet medmet peqmet grdnmet mednmet peqnmet - objeto
+        box1 box2 box3 - destination
+        inicio destino - location
+        esteira
+        caracteristica
     )
-    ;;pequeno_nmetalico pequeno_metalico medio_nmetalico medio_metalico grande_nmetalico grande_metalico - caracteristica
 
     (:predicates
-        ;; propriedades dos atuadores
+        ;;Estado do atuador
         (extended ?atuador - atuador)
-        (tipo ?s1 - atuador_simples ?c1 - caracteristica)
-
-        ;; propriedades do atuador_duplo
-        ;(retracted ?s - atuador_duplo)
-        ;;(extended2 ?s - atuador_duplo)
-
-
-
-
-        ;;propriedades da esteira
+        
+        ;;Estado da esteira
         (ligado ?e - esteira)
-
-
-
-        (connected ?a - atuador ?c - caracteristica)
-        ;;(connected2 ?ad - atuador_duplo ?c - caracteristica)
-
-        (true1 ?c - caracteristica)
-
-
-        (type ?i - item ?c - caracteristica)
-        (at ?l - location ?i - locatable)
-
-        (blocked ?e - esteira)
-        (sorted ?i - item)
-
+        
+        ;;Local do objeto
+        (at ?o - objeto ?l - location)
+        
+        ;;Sensor de final de curso
         (s_fimdecurso ?a - atuador)
-
-
-        (link ?i - item ?i - item)
+        
+        ;;Tipo do objeto
+        (type ?o - objeto ?c - caracteristica)
+        
     )
-
 
     ;; ligar a esteira
     (:action ligar_esteira
@@ -63,98 +44,106 @@
     (:action desligar_esteira
         :parameters (?e - esteira)
         :precondition (and
-            (not (blocked ?e))
             (ligado ?e)
         )
         :effect (and
             (not (ligado ?e))
         )
     )
-
-    (:action liga_avanco_atuador_simples
-        :parameters (?as - atuador_simples ?c - caracteristica ?e - esteira ?l - location ?i - item ?x - inicio)
+    
+    ;; Extende o atuador 1
+    (:action extende_atuador1
+        :parameters(?e - esteira ?a1 - atuador_simples1 ?a2 - atuador_simples2 ?a3 - atuador_duplo1 ?d - box1 ?i - inicio ?o - objeto ?c - caracteristica)
         :precondition (and
+            (type ?o ?c)
             (ligado ?e)
-            (connected ?as ?c)
-            (not (extended ?as))
-            (at ?l ?as)
-            (type ?i ?c)
-            (not (blocked ?e))
-            (not (sorted ?i))
-            (at ?x ?i)
+            (not (extended ?a1))
+            (not (extended ?a2))
+            (not (extended ?a3))
+            (at ?o ?i)
         )
         :effect (and
-            (blocked ?e)
-            (extended ?as)
-            (at ?l ?i)
-            (sorted ?i)
-            (s_fimdecurso ?as)
+            (at ?o ?d)
+            (not (at ?i ?d))
+            (extended ?a1)
+            (s_fimdecurso ?a1)
+        )
+    )
+    
+    ;; Extende o atuador 2
+    (:action extende_atuador2
+        :parameters(?e - esteira ?a1 - atuador_simples1 ?a2 - atuador_simples2 ?a3 - atuador_duplo1 ?d - box2 ?i - inicio ?o - objeto ?c - caracteristica)
+        :precondition (and
+            (type ?o ?c)
             (ligado ?e)
-        )
-    )
-
-    (:action desliga_avanco_atuador_simples
-        :parameters (?as - atuador_simples ?e - esteira)
-        :precondition (and
-            (s_fimdecurso ?as)
-            (extended ?as)
+            (not (extended ?a1))
+            (not (extended ?a2))
+            (not (extended ?a3))
+            (at ?o ?i)
         )
         :effect (and
-            (not (extended ?as))
-            (not (blocked ?e))
-            (not (s_fimdecurso ?as))
+            (at ?o ?d)
+            (not (at ?i ?d))
+            (extended ?a2)
+            (s_fimdecurso ?a2)
         )
     )
-
-
-    (:action liga_avanco_atuador_duplo
-        :parameters (?ad - atuador_duplo ?c - caracteristica ?e - esteira ?l - location ?i - item ?x - inicio)
+    
+    ;; Extende o atuador 3
+    (:action extende_atuador3
+        :parameters(?e - esteira ?a1 - atuador_simples1 ?a2 - atuador_simples2 ?a3 - atuador_duplo1 ?d - box3 ?i - inicio ?o - objeto ?c - caracteristica)
         :precondition (and
+            (type ?o ?c)
             (ligado ?e)
-            (connected ?ad ?c)
-            (not (extended ?ad))
-            (at ?l ?ad)
-            (type ?i ?c)
-            (not (blocked ?e))
-            (not (sorted ?i))
-            (at ?x ?i)
-        )
+            (not (extended ?a1))
+            (not (extended ?a2))
+            (not (extended ?a3))
+            (at ?o ?i)
+            )
         :effect (and
-            (blocked ?e)
-            (extended ?ad)
-            (at ?l ?i)
-            (sorted ?i)
-            (s_fimdecurso ?ad)
-            (ligado ?e)
+            (at ?o ?d)
+            (not (at ?i ?d))
+            (extended ?a3)
+            (s_fimdecurso ?a3)
         )
     )
-
-    (:action desliga_avanco_atuador_duplo
-        :parameters (?ad - atuador_duplo ?e - esteira)
+    
+    ;; Retrai o atuador 1
+    (:action retrai_atuador1
+        :parameters(?a1 - atuador_simples1)
         :precondition (and
-            (s_fimdecurso ?ad)
-            (extended ?ad)
+            (s_fimdecurso ?a1)
+            (extended ?a1)
         )
         :effect (and
-            (not (extended ?ad))
-	        (not (blocked ?e))
-	        (not (s_fimdecurso ?ad))
+            (not (extended ?a1))
+            (not (s_fimdecurso ?a1))
         )
     )
-
-
-
-    (:action next_link
-        :parameters (?i - item ?f - item ?l - inicio)
+    
+    ;; Retrai o atuador 2
+    (:action retrai_atuador2
+        :parameters(?a2 - atuador_simples2)
         :precondition (and
-            (link ?i ?f)
-            (sorted ?i)
+            (s_fimdecurso ?a2)
+            (extended ?a2)
         )
         :effect (and
-            (at ?l ?f)
+            (not (extended ?a2))
+            (not (s_fimdecurso ?a2))
         )
     )
-
-
-
+    
+    ;; Retrai o atuador 3
+    (:action retrai_atuador3
+        :parameters(?a3 - atuador_duplo1)
+        :precondition (and
+            (s_fimdecurso ?a3)
+            (extended ?a3)
+        )
+        :effect (and
+            (not (extended ?a3))
+            (not (s_fimdecurso ?a3))
+        )
+    )
 )

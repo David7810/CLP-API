@@ -25,11 +25,11 @@ class Mainloop():
             'anvanca_ap1': False,    #IN
             'anvanca_ap2': False,    #IN
             'anvanca_ap3': False,    #IN
-            'retrai_ap3': False,     #IN
+            'retrai_ap3': False,     #IN Logica interna
             'fc_1': False,           #OUT
             'fc_2': False,           #OUT
             'fc_3': False,           #OUT
-            'fc_4': False,           #OUT
+            #'fc_4': False,          #OUT
             'peca_peqnmet': False,   #OUT
             'peca_peqmet': False,    #OUT
             'peca_mednmet': False,   #OUT
@@ -212,13 +212,13 @@ class Mainloop():
                 precondition_dict['peca_peqmet'] = True
 
             if re.search("(type item.? grdnmet)", precondition):
-                precondition_dict['peca_grdmet'] = True
+                precondition_dict['peca_grdnmet'] = True
 
             if re.search("(type item.? mednmet)", precondition):
-                precondition_dict['peca_medmet'] = True
+                precondition_dict['peca_mednmet'] = True
 
             if re.search("(type item.? peqnmet)", precondition):
-                precondition_dict['peca_peqmet'] = True
+                precondition_dict['peca_peqnmet'] = True
 
             if "(not\n(ligado esteira)\n)" in effect:
                 effect_dict['liga_esteira'] = False
@@ -270,13 +270,13 @@ class Mainloop():
                 effect_dict['peca_peqmet'] = True
 
             if re.search("(type item.? grdnmet)", effect):
-                effect_dict['peca_grdmet'] = True
+                effect_dict['peca_grdnmet'] = True
 
             if re.search("(type item.? mednmet)", effect):
-                effect_dict['peca_medmet'] = True
+                effect_dict['peca_mednmet'] = True
 
             if re.search("(type item.? peqnmet)", effect):
-                effect_dict['peca_peqmet'] = True
+                effect_dict['peca_peqnmet'] = True
 
             print("\nPrecondition dict: ")
             print(precondition_dict)

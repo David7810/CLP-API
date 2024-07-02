@@ -336,54 +336,80 @@ class aUI:
             for line in f:
                 if line.startswith('	##definir_itens'):
                     line = '        '
-                    for x in range(n_items):
-                        line = line + 'item' + str(x) + ' '
-                    line += '- item'
+                    num = 0
+                    tipo_items = {}
+                    for x in range(n_peq_metal):
+                        line = line + 'item' + str(num) + ' - peqmet\n        '
+                        tipo_items['item' + str(num)] = 'peqmet'
+                        num += 1
+
+                    for x in range(n_med_metal):
+                        line = line + 'item' + str(num) + ' - medmet\n        '
+                        tipo_items['item' + str(num)] = 'medmet'
+                        num += 1
+
+                    for x in range(n_grd_metal):
+                        line = line + 'item' + str(num) + ' - grdmet\n        '
+                        tipo_items['item' + str(num)] = 'grdmet'
+                        num += 1
+
+                    for x in range(n_peq):
+                        line = line + 'item' + str(num) + ' - peqnmet\n        '
+                        tipo_items['item' + str(num)] = 'peqnmet'
+                        num += 1
+
+                    for x in range(n_med):
+                        line = line + 'item' + str(num) + ' - mednmet\n        '
+                        tipo_items['item' + str(num)] = 'mednmet'
+                        num += 1
+
+                    for x in range(n_grd):
+                        line = line + 'item' + str(num) + ' - grdnmet\n        '
+                        tipo_items['item' + str(num)] = 'grdnmet'
+                        num += 1
 
                 if line.startswith('	##definir_tipos'):
                     line = '        '
                     num = 0
                     tipo_items = {}
                     for x in range(n_peq_metal):
-                        line = line + '(type item' + str(num) + ' ' + 'peqmet)\n        '
+                        line = line + '(type item' + str(num) + ' ' + 'peqmet1)\n        '
                         tipo_items['item' + str(num)] = 'peqmet'
                         num += 1
 
                     for x in range(n_med_metal):
-                        line = line + '(type item' + str(num) + ' ' + 'medmet)\n        '
+                        line = line + '(type item' + str(num) + ' ' + 'medmet1)\n        '
                         tipo_items['item' + str(num)] = 'medmet'
                         num += 1
 
                     for x in range(n_grd_metal):
-                        line = line + '(type item' + str(num) + ' ' + 'grdmet)\n        '
+                        line = line + '(type item' + str(num) + ' ' + 'grdmet1)\n        '
                         tipo_items['item' + str(num)] = 'grdmet'
                         num += 1
 
                     for x in range(n_peq):
-                        line = line + '(type item' + str(num) + ' ' + 'peqnmet)\n        '
+                        line = line + '(type item' + str(num) + ' ' + 'peqnmet1)\n        '
                         tipo_items['item' + str(num)] = 'peqnmet'
                         num += 1
 
                     for x in range(n_med):
-                        line = line + '(type item' + str(num) + ' ' + 'mednmet)\n        '
+                        line = line + '(type item' + str(num) + ' ' + 'mednmet1)\n        '
                         tipo_items['item' + str(num)] = 'mednmet'
                         num += 1
 
                     for x in range(n_grd):
-                        line = line + '(type item' + str(num) + ' ' + 'grdnmet)\n        '
+                        line = line + '(type item' + str(num) + ' ' + 'grdnmet1)\n        '
                         tipo_items['item' + str(num)] = 'grdnmet'
                         num += 1
 
+
+
                 if line.startswith('	##definir_inicio'):
-                    if n_items > 0:
-                        line = '        (at inicio item0)'
-
-                if line.startswith('	##definir_ordem'):
                     line = '        '
-                    for x in range(n_items - 1):
-                        line = line + '(link item' + str(x) + ' item' + str(x + 1) + ')\n        '
+                    for x in range(n_items):
+                        line = line + '(at item' + str(x) + ' inicio' + ')\n        '
 
-                if line.startswith('	##definir_destino'):
+                if line.startswith('        ##definir_destino'):
                     line = '        '
 
                     key_list = list(tipo_items.keys())
@@ -501,14 +527,13 @@ class aUI:
                     # for x in range(n_box1):
                     #   line += '(at box1 ' +
                     for key, value in tipo_items.items():
-                        line += '(at ' + value + ' ' + key + ')' + '\n        '
+                        line += '(at ' + key + ' ' + value + ')' + '\n        '
 
                 lines.append(line)
 
         # Escrevendo o problema no arquivo
         with open('problem.pddl', 'w') as f:
             f.writelines(lines)
-
 
 if __name__ == "__main__":
     app = aUI()
