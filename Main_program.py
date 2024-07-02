@@ -343,9 +343,9 @@ class Mainloop():
                         F1 = True
                     elif (F1 and effect_dict['anvanca_ap3'] == False):
                         print("retract pulse")
-                        modbus.write_coil_call(self.client, 5, True)
+                        modbus.write_coil_call(self.client, 4, True)
                         time.sleep(0.1)
-                        modbus.write_coil_call(self.client, 5, False)
+                        modbus.write_coil_call(self.client, 4, False)
                         F1 = False
 
                 self.table['liga_esteira'] = modbus.read_coil_call(self.client, 0)
