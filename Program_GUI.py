@@ -72,9 +72,9 @@ class aUI:
         self.frame3.pack_propagate(0)
         self.frame6 = ttk.Frame(tk2)
         self.frame6.configure(height=720, width=1280)
-        canvas1 = tk.Canvas(self.frame6)
-        canvas1.configure(height=450, state="normal", width=1152)
-        canvas1.pack(padx=20, pady=20, side="top")
+        self.canvas1 = tk.Canvas(self.frame6)
+        self.canvas1.configure(height=450, state="normal", width=1152)
+        self.canvas1.pack(padx=20, pady=20, side="top")
         frame5 = ttk.Frame(self.frame6)
         frame5.configure(height=200, width=200)
         labelframe2 = ttk.Labelframe(frame5)
@@ -168,7 +168,7 @@ class aUI:
         labelframe4.configure(height=200, text='Execução', width=200)
         label10 = ttk.Label(labelframe4)
         label10.configure(text='Estado:  ')
-        label10.pack(expand=True, side="top")
+        #label10.pack(expand=True, side="top")
         button2 = ttk.Button(labelframe4)
         button2.configure(text='Iniciar', command=self.iniciar)
         button2.pack(expand=True, side="top")
@@ -176,25 +176,77 @@ class aUI:
         self.button3.configure(text='Parar/Reprogamar', command=self.parar)
         self.button3.pack(expand=True, side="top")
         button4 = ttk.Button(labelframe4)
-        button4.configure(text='Desconectar e Resetar', command=self.desconectar)
+        button4.configure(text='Desconectar', command=self.desconectar)
         button4.pack(expand=True, side="top")
         labelframe4.grid(column=2, padx=25, row=0)
         labelframe4.pack_propagate(0)
         labelframe3 = ttk.Labelframe(frame5)
         labelframe3.configure(
             height=200,
-            text='Registro de eventos\n',
+            text='',
             width=200)
-        text1 = tk.Text(labelframe3)
-        text1.configure(height=10, state="disabled", width=50)
-        text1.pack(padx=0, pady=0, side="top")
+        self.text1 = tk.Text(labelframe3)
+        self.text1.configure(height=10, state="disabled", width=50)
+        self.text1.pack(padx=0, pady=0, side="top")
         labelframe3.grid(column=3, row=0)
         frame5.pack(side="top")
         self.frame6.grid(column=0, row=0)
         self.frame6.pack_propagate(0)
 
+        #Carrega a ilustracao
+
+        self.expiston = tk.PhotoImage(file='./assets/expiston.gif')
+        self.piston = tk.PhotoImage(file='./assets/piston.gif')
+        self.gndmet = tk.PhotoImage(file='./assets/gndmet.gif')
+        self.medmet = tk.PhotoImage(file='./assets/medmet.gif')
+        self.peqmet = tk.PhotoImage(file='./assets/peqnmet.gif')
+        self.gndnmet = tk.PhotoImage(file='./assets/gndnmet.gif')
+        self.mednmet = tk.PhotoImage(file='./assets/mednmet.gif')
+        self.peqnmet = tk.PhotoImage(file='./assets/peqnmet.gif')
+        self.peqmet_id = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.peqmet)
+        self.medmet_id = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.medmet)
+        self.gndmet_id = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.gndmet)
+        self.gndnmet_id = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.gndnmet)
+        self.mednmet_id = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.mednmet)
+        self.peqnmet_id = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.peqnmet)
+        self.piston1_id = self.canvas1.create_image(345, 15, anchor=tk.NW, image=self.piston)
+        self.piston2_id = self.canvas1.create_image(575, 15, anchor=tk.NW, image=self.piston)
+        self.piston3_id = self.canvas1.create_image(785, 15, anchor=tk.NW, image=self.piston)
+        self.expiston1_id = self.canvas1.create_image(345, 15, anchor=tk.NW, image=self.expiston)
+        self.expiston2_id = self.canvas1.create_image(575, 15, anchor=tk.NW, image=self.expiston)
+        self.expiston3_id = self.canvas1.create_image(785, 15, anchor=tk.NW, image=self.expiston)
+
+
+        self.belt = tk.PhotoImage(file='./assets/belt.gif')
+        self.belt_moving_frames = self.load_gif_frames('./assets/belt_moving.gif')
+        self.belt_id = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.belt)
+        self.belt_moving_id = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.belt_moving_frames[0])
+        self.frame_index = 0
+        self.canvas1.tag_raise(self.piston1_id)
+        self.canvas1.tag_raise(self.piston2_id)
+        self.canvas1.tag_raise(self.piston3_id)
+        self.canvas1.tag_raise(self.expiston1_id)
+        self.canvas1.tag_raise(self.expiston2_id)
+        self.canvas1.tag_raise(self.expiston3_id)
+
         # Main widget
         self.mainwindow = tk2
+
+    def load_gif_frames(self, file_path):
+        frames = []
+        image = tk.PhotoImage(file=file_path)
+        try:
+            i = 0
+            while True:
+                frames.append(image.subsample(1, 1).copy())
+                i += 1
+                image = tk.PhotoImage(file=file_path, format=f"gif -index {i}")
+        except:
+            pass
+        return frames
+
+
+
 
     def run(self):
         self.update()
@@ -258,8 +310,13 @@ class aUI:
         #self.f1 = not self.f1
         #print(threading.enumerate(),'\n')
 
+        self.UpdateCanvas()
+
+
 
         self.mainwindow.after(50, self.update)
+
+
 
     def conectar(self):
         entered_value = self.entry.get()
@@ -276,11 +333,16 @@ class aUI:
     def iniciar(self):
         self.generate_problem()
         self.client_instance.enable()
+        self.text1.configure(state="normal")
+        self.text1.insert(tk.END, "Iniciando\n")
+        self.text1.configure(state="disabled")
 
     def parar(self):
         self.client_instance.stop1()
         self.conectar()
-
+        self.text1.configure(state="normal")
+        self.text1.insert(tk.END, "Parando\n")
+        self.text1.configure(state="disabled")
     def desconectar(self):
         self.client_instance.stop1()
 
@@ -534,6 +596,41 @@ class aUI:
         # Escrevendo o problema no arquivo
         with open('problem.pddl', 'w') as f:
             f.writelines(lines)
+
+    def UpdateCanvas(self):
+
+        if self.client_instance is not None:
+            if self.client_instance.get_table()['liga_esteira']:
+                self.canvas1.itemconfigure(self.belt_id, state=tk.HIDDEN)
+                self.canvas1.itemconfig(self.belt_moving_id, image=self.belt_moving_frames[self.frame_index])
+                self.frame_index = (self.frame_index + 1) % len(self.belt_moving_frames)
+                self.canvas1.itemconfigure(self.belt_moving_id, state=tk.NORMAL)
+            else:
+                self.canvas1.itemconfigure(self.belt_moving_id, state=tk.HIDDEN)
+                self.canvas1.itemconfigure(self.belt_id, state=tk.NORMAL)
+                #self.canvas1.tag_raise(self.piston1_id)
+
+            if self.client_instance.get_table()['anvanca_ap1']:
+                self.canvas1.itemconfigure(self.expiston1_id, state=tk.NORMAL)
+                self.canvas1.itemconfigure(self.piston1_id, state=tk.HIDDEN)
+            else:
+                self.canvas1.itemconfigure(self.expiston1_id, state=tk.HIDDEN)
+                self.canvas1.itemconfigure(self.piston1_id, state=tk.NORMAL)
+
+            if self.client_instance.get_table()['anvanca_ap2']:
+                self.canvas1.itemconfigure(self.expiston2_id, state=tk.NORMAL)
+                self.canvas1.itemconfigure(self.piston2_id, state=tk.HIDDEN)
+            else:
+                self.canvas1.itemconfigure(self.expiston2_id, state=tk.HIDDEN)
+                self.canvas1.itemconfigure(self.piston2_id, state=tk.NORMAL)
+
+            if self.client_instance.get_table()['anvanca_ap3']:
+                self.canvas1.itemconfigure(self.expiston3_id, state=tk.NORMAL)
+                self.canvas1.itemconfigure(self.piston3_id, state=tk.HIDDEN)
+            else:
+                self.canvas1.itemconfigure(self.expiston3_id, state=tk.HIDDEN)
+                self.canvas1.itemconfigure(self.piston3_id, state=tk.NORMAL)
+
 
 if __name__ == "__main__":
     app = aUI()
