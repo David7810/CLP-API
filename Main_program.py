@@ -65,12 +65,6 @@ class Mainloop():
         self.running = False
         self.stop = False
 
-        # Define o estado inicial
-        modbus.write_coil_call(self.client, self.coil_addr['liga_esteira'], False)
-        modbus.write_coil_call(self.client, self.coil_addr['anvanca_ap1'], False)
-        modbus.write_coil_call(self.client, self.coil_addr['anvanca_ap2'], False)
-        modbus.write_coil_call(self.client, self.coil_addr['anvanca_ap3'], False)
-        modbus.write_coil_call(self.client, self.coil_addr['retrai_ap3'], False)
 
 
     def get_table(self):
@@ -93,6 +87,13 @@ class Mainloop():
     def getstate(self):
         return self.running
 
+    def reset(self):
+        modbus.write_coil_call(self.client, self.coil_addr['liga_esteira'], False)
+        modbus.write_coil_call(self.client, self.coil_addr['anvanca_ap1'], False)
+        modbus.write_coil_call(self.client, self.coil_addr['anvanca_ap2'], False)
+        modbus.write_coil_call(self.client, self.coil_addr['anvanca_ap3'], False)
+        modbus.write_coil_call(self.client, self.coil_addr['retrai_ap3'], False)
+
     def run(self):
 
         #Cria o cliente modbus com o ip fornecido.
@@ -100,6 +101,7 @@ class Mainloop():
         self.client.connect()
 
         #print(self.client.connected)
+
 
 
 
@@ -302,6 +304,7 @@ class Mainloop():
             while not precondition_met:
                 if self.stop:
                 #if not self.running:
+                    self.reset()
                     return 0
 
 
@@ -338,6 +341,7 @@ class Mainloop():
             while not effect_met:
                 if self.stop:
                 #if not self.running:
+                    self.reset()
                     return 0
 
                 if 'liga_esteira' in effect_dict:

@@ -82,7 +82,7 @@ class aUI:
         self.entry = ttk.Entry(self.frame3)
         self.entry.pack(anchor="center", side="top")
         button1 = ttk.Button(self.frame3)
-        button1.configure(text='Conectar', command= self.conectar)
+        button1.configure(text='Definir Endereço', command= self.conectar)
         button1.pack(anchor="center", pady=20, side="top")
         self.frame3.grid(column=0, row=0)
         self.frame3.pack_propagate(0)
