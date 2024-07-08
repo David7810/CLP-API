@@ -5,6 +5,7 @@ import tkinter.ttk as ttk
 from Main_program import Mainloop
 from Main_program import modbus
 import threading
+from queue import Queue
 
 #Extendendo a classe do programa principal
 class Main_program_ThreadClient(Mainloop):
@@ -39,9 +40,12 @@ class Main_program_ThreadClient(Mainloop):
         try:
             Mainloop.run(self)
         except Exception as err:
+            #self.stop1()
             raise err
+            #sys.exit()
         else:
-            self.finalizado = True
+            if self.finalizado:
+                return 2
 
 #!/usr/bin/python3
 import tkinter as tk
@@ -57,8 +61,10 @@ class aUI:
     def __init__(self, master=None):
 
         #self.thread_client = Main_program_ThreadClient()
+        self.ip = None
         self.thread_client = None
         self.client_instance = None
+        self.que = Queue()
 
         # build ui
         tk2 = tk.Tk(master)
@@ -238,6 +244,9 @@ class aUI:
         self.canvas1.tag_raise(self.expiston1_id)
         self.canvas1.tag_raise(self.expiston2_id)
         self.canvas1.tag_raise(self.expiston3_id)
+        self.canvas1.itemconfigure(self.expiston1_id, state=tk.HIDDEN)
+        self.canvas1.itemconfigure(self.expiston2_id, state=tk.HIDDEN)
+        self.canvas1.itemconfigure(self.expiston3_id, state=tk.HIDDEN)
 
         self.frame3.tkraise()
 
@@ -282,8 +291,15 @@ class aUI:
 
     #Atualiza a interface
     def update(self):
-        if self.client_instance is not None:
-            print(self.client_instance.finalizado)
+        #if self.client_instance is not None:
+        #    print(self.client_instance.finalizado)
+
+        if not self.que.empty():
+            if self.que.get() == 2:
+                self.text1.configure(state="normal")
+                self.text1.insert(tk.END, "Plano finalizado com sucesso\n")
+                self.text1.see(tk.END)
+                self.text1.configure(state="disabled")
 
         if self.thread_client is not None and self.thread_client.is_alive():
             self.spinbox2.configure(state=tk.DISABLED)
@@ -357,38 +373,42 @@ class aUI:
         entered_value = self.entry.get()
         #print('entered value:', entered_value)
         if entered_value != "":
-            try:
-                self.client_instance = Main_program_ThreadClient(entered_value)
-            except:
-                print('Erro: Não foi possível conectar ao enderço fornecido.')
-                self.new_window('Erro: Não foi possível conectar ao enderço fornecido.')
-            else:
-                self.frame6.tkraise()
-
+            self.ip = entered_value
+            self.frame6.tkraise()
+        else:
+            self.new_window('Endereço invalido')
         #self.client_instance.enable()
         #self.thread_client.start()
         #self.thread_client()
         #self.table = self.instance.prog.table
 
     def iniciar(self):
+        try:
+            self.client_instance = Main_program_ThreadClient(self.ip)
+        except Exception as err:
+            print('Erro: Não foi possível conectar ao enderço do controlador.')
+            self.new_window('Erro: Não foi possível conectar ao enderço do controlador.')
+            raise err
         self.generate_problem()
         self.client_instance.enable()
         self.text1.configure(state="normal")
         self.text1.insert(tk.END, "Iniciando\n")
         self.text1.see(tk.END)
         self.text1.configure(state="disabled")
-        self.thread_client = threading.Thread(target=lambda a: a.run(), args=([self.client_instance]))
+        #self.thread_client = threading.Thread(target=lambda a: a.run(), args=([self.client_instance]))
+        self.thread_client = threading.Thread(target=lambda q, a: q.put(a.run()), args=(self.que, self.client_instance))
         self.thread_client.start()
 
     def parar(self):
         self.client_instance.stop1()
-        self.conectar()
+        #self.conectar()
         self.text1.configure(state="normal")
         self.text1.insert(tk.END, "Parando\n")
         self.text1.see(tk.END)
         self.text1.configure(state="disabled")
     def desconectar(self):
-        self.client_instance.stop1()
+        if self.client_instance is not None:
+            self.client_instance.stop1()
         self.frame3.tkraise()
 
     def generate_problem(self):
@@ -643,7 +663,7 @@ class aUI:
 
     def UpdateCanvas(self):
         if self.client_instance is not None:
-            if self.client_instance.get_table()['liga_esteira']:
+            if self.client_instance.get_table()['liga_esteira'] and self.thread_client.is_alive():
                 self.canvas1.itemconfigure(self.belt_id, state=tk.HIDDEN)
                 self.canvas1.itemconfig(self.belt_moving_id, image=self.belt_moving_frames[self.frame_index])
                 self.frame_index = (self.frame_index + 1) % len(self.belt_moving_frames)
@@ -651,7 +671,6 @@ class aUI:
             else:
                 self.canvas1.itemconfigure(self.belt_moving_id, state=tk.HIDDEN)
                 self.canvas1.itemconfigure(self.belt_id, state=tk.NORMAL)
-                #self.canvas1.tag_raise(self.piston1_id)
 
             if self.client_instance.get_table()['anvanca_ap1']:
                 self.canvas1.itemconfigure(self.expiston1_id, state=tk.NORMAL)

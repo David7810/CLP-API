@@ -16,6 +16,8 @@ class Mainloop():
         #Instancia o cliente Modbus.
         self.client = modbus.ModbusTcpClient(ip)
 
+        self.finalizado = False
+
         #Dicionario contendo o estado das entradas e saidas digitais do CLP.
         #Inicialmente todas os registros sao inicializados como falso.
         #Quando em execucao as variaveis associadas as entradas digitais do CLP serao atualizados
@@ -140,9 +142,9 @@ class Mainloop():
         #tomada, os parametros relativos a essa acao, as condicoes para que essa acao seja tomada e os efeitos esperados depois que a acao é executada.
         try:
             solutionList = responseDict['plans'][0]['result']['plan']
-        except:
+        except Exception as err:
             print('Erro ao obter a solução.')
-            return 1
+            raise err
         #Salvando a solucao completa contendo todas as acoes em um arquivo
         with open('./solution', 'w') as f:
             f.write('\n'.join([act['action'] for act in solutionList]))
@@ -391,7 +393,7 @@ class Mainloop():
                 print(effect_dict)
                 print('-------')
             print("\n-------------------------------------")
-        return 2
+        self.finalizado = True
 
 
 
