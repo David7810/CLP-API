@@ -3,12 +3,14 @@ import tkinter as tk
 import tkinter.ttk as ttk
 
 from Main_program import Mainloop
+from Main_program import modbus
 import threading
 
 #Extendendo a classe do programa principal
 class Main_program_ThreadClient(Mainloop):
     def __init__(self,ip):
         super().__init__(ip)
+        self.finalizado = False
         self.lock = threading.Lock()
 
     #Sobrescrevendo os metodos de escrita/leitura com metodos seguros para threads
@@ -24,14 +26,22 @@ class Main_program_ThreadClient(Mainloop):
         with self.lock:
             self.running = True
 
-    def disable(self):
-        with self.lock:
-            self.running = False
-
     def stop1(self):
         with self.lock:
             self.stop = True
 
+    def getstate(self):
+        with self.lock:
+            return self.running
+
+    def run(self):
+        self.finalizado = False
+        try:
+            Mainloop.run(self)
+        except Exception as err:
+            raise err
+        else:
+            self.finalizado = True
 
 #!/usr/bin/python3
 import tkinter as tk
@@ -169,9 +179,9 @@ class aUI:
         label10 = ttk.Label(labelframe4)
         label10.configure(text='Estado:  ')
         #label10.pack(expand=True, side="top")
-        button2 = ttk.Button(labelframe4)
-        button2.configure(text='Iniciar', command=self.iniciar)
-        button2.pack(expand=True, side="top")
+        self.button2 = ttk.Button(labelframe4)
+        self.button2.configure(text='Iniciar', command=self.iniciar)
+        self.button2.pack(expand=True, side="top")
         self.button3 = ttk.Button(labelframe4)
         self.button3.configure(text='Parar/Reprogamar', command=self.parar)
         self.button3.pack(expand=True, side="top")
@@ -229,8 +239,26 @@ class aUI:
         self.canvas1.tag_raise(self.expiston2_id)
         self.canvas1.tag_raise(self.expiston3_id)
 
+        self.frame3.tkraise()
+
         # Main widget
         self.mainwindow = tk2
+
+    def new_window(self, message):
+        # Create a new window
+        window = tk.Toplevel()
+        window.title("Mensagem")
+
+        # Set the size of the new window
+        window.geometry("300x100")
+
+        # Create a label to display the message
+        label = tk.Label(window, text=message)
+        label.pack(pady=15)
+
+        # Create a button to close the new window
+        close_button = tk.Button(window, text="Fechar", command=window.destroy)
+        close_button.pack(pady=10)
 
     def load_gif_frames(self, file_path):
         frames = []
@@ -254,8 +282,10 @@ class aUI:
 
     #Atualiza a interface
     def update(self):
+        if self.client_instance is not None:
+            print(self.client_instance.finalizado)
 
-        if self.client_instance is not None and self.client_instance.getstate():
+        if self.thread_client is not None and self.thread_client.is_alive():
             self.spinbox2.configure(state=tk.DISABLED)
             self.spinbox3.configure(state=tk.DISABLED)
             self.spinbox4.configure(state=tk.DISABLED)
@@ -274,6 +304,8 @@ class aUI:
             self.spinbox17.configure(state=tk.DISABLED)
             self.spinbox18.configure(state=tk.DISABLED)
             self.spinbox19.configure(state=tk.DISABLED)
+            self.button2.configure(state=tk.DISABLED)
+            self.button3.configure(state=tk.NORMAL)
         else:
             self.spinbox2.configure(state=tk.NORMAL)
             self.spinbox3.configure(state=tk.NORMAL)
@@ -293,8 +325,10 @@ class aUI:
             self.spinbox17.configure(state=tk.NORMAL)
             self.spinbox18.configure(state=tk.NORMAL)
             self.spinbox19.configure(state=tk.NORMAL)
+            self.button2.configure(state=tk.NORMAL)
+            self.button3.configure(state=tk.DISABLED)
 
-
+        '''
         if self.thread_client is not None:
             if self.thread_client.is_alive() and self.client_instance.client.connected:
                 self.frame6.tkraise()
@@ -302,6 +336,7 @@ class aUI:
                 self.frame3.tkraise()
         else :
             self.frame3.tkraise()
+        '''
         #if self.f1:
         #    self.frame3.tkraise()
         #else:
@@ -320,11 +355,16 @@ class aUI:
 
     def conectar(self):
         entered_value = self.entry.get()
-        print('entered value:', entered_value)
+        #print('entered value:', entered_value)
         if entered_value != "":
-            self.client_instance = Main_program_ThreadClient(entered_value)
-            self.thread_client = threading.Thread(target=lambda a: a.run(), args=([self.client_instance]))
-            self.thread_client.start()
+            try:
+                self.client_instance = Main_program_ThreadClient(entered_value)
+            except:
+                print('Erro: Não foi possível conectar ao enderço fornecido.')
+                self.new_window('Erro: Não foi possível conectar ao enderço fornecido.')
+            else:
+                self.frame6.tkraise()
+
         #self.client_instance.enable()
         #self.thread_client.start()
         #self.thread_client()
@@ -335,17 +375,21 @@ class aUI:
         self.client_instance.enable()
         self.text1.configure(state="normal")
         self.text1.insert(tk.END, "Iniciando\n")
+        self.text1.see(tk.END)
         self.text1.configure(state="disabled")
+        self.thread_client = threading.Thread(target=lambda a: a.run(), args=([self.client_instance]))
+        self.thread_client.start()
 
     def parar(self):
         self.client_instance.stop1()
         self.conectar()
         self.text1.configure(state="normal")
         self.text1.insert(tk.END, "Parando\n")
+        self.text1.see(tk.END)
         self.text1.configure(state="disabled")
     def desconectar(self):
         self.client_instance.stop1()
-
+        self.frame3.tkraise()
 
     def generate_problem(self):
         # Armazena as informacoes sobre o problema desejado
@@ -598,7 +642,6 @@ class aUI:
             f.writelines(lines)
 
     def UpdateCanvas(self):
-
         if self.client_instance is not None:
             if self.client_instance.get_table()['liga_esteira']:
                 self.canvas1.itemconfigure(self.belt_id, state=tk.HIDDEN)

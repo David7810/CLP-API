@@ -29,7 +29,7 @@ class Mainloop():
             'fc_1': False,           #OUT
             'fc_2': False,           #OUT
             'fc_3': False,           #OUT
-            #'fc_4': False,          #OUT
+            'fc_4': False,          #OUT
             'peca_peqnmet': False,   #OUT
             'peca_peqmet': False,    #OUT
             'peca_mednmet': False,   #OUT
@@ -38,6 +38,24 @@ class Mainloop():
             'peca_grandmet': False   #OUT
         }
 
+        # Enderco das entradas e saidas
+        self.coil_addr = {
+            'liga_esteira': 0,
+            'anvanca_ap1': 1,
+            'anvanca_ap2': 2,
+            'anvanca_ap3': 3,
+            'retrai_ap3': 4,
+            'fc_1': 14,
+            'fc_2': 15,
+            'fc_3': 16,
+            'fc_4': 17,
+            'peca_peqnmet': 20,
+            'peca_peqmet': 21,
+            'peca_mednmet': 22,
+            'peca_medmet': 23,
+            'peca_grandnmet': 24,
+            'peca_grandmet': 25
+        }
 
         #Flags de status de funcionamento
         self.start = False
@@ -45,11 +63,20 @@ class Mainloop():
         self.running = False
         self.stop = False
 
+        # Define o estado inicial
+        modbus.write_coil_call(self.client, self.coil_addr['liga_esteira'], False)
+        modbus.write_coil_call(self.client, self.coil_addr['anvanca_ap1'], False)
+        modbus.write_coil_call(self.client, self.coil_addr['anvanca_ap2'], False)
+        modbus.write_coil_call(self.client, self.coil_addr['anvanca_ap3'], False)
+        modbus.write_coil_call(self.client, self.coil_addr['retrai_ap3'], False)
+
+
     def get_table(self):
         return self.table
 
     def set_table(self, table):
         self.table = table
+
 
     def pause(self):
         self.state = False
@@ -58,10 +85,7 @@ class Mainloop():
     def enable(self):
         self.running = True
 
-    def disable(self):
-        self.running = False
-
-    def stop(self):
+    def stop1(self):
         self.stop = True
 
     def getstate(self):
@@ -77,26 +101,8 @@ class Mainloop():
 
 
 
-        #Define o estado inicial
-        try:
-            liga_esteira = modbus.write_coil_call(self.client, 0, False)
-            anvanca_ap1 = modbus.write_coil_call(self.client, 2, False)
-            anvanca_ap2 = modbus.write_coil_call(self.client, 3, False)
-            #fc_1 = modbus.write_coil_call(self.client, 14, False)
-            #fc_2 = modbus.write_coil_call(self.client, 15, False)
-            #fc_3 = modbus.write_coil_call(self.client, 16, False)
-            #fc_4 = modbus.write_coil_call(self.client, 17, False)
-            peca_peqnmet = modbus.write_coil_call(self.client, 20, False)
-            peca_peqmet = modbus.write_coil_call(self.client, 21, False)
-            peca_mednmet = modbus.write_coil_call(self.client, 22, False)
-            peca_medmet = modbus.write_coil_call(self.client, 23, False)
-            peca_grdnmet = modbus.write_coil_call(self.client, 24, False)
-            peca_grdmet = modbus.write_coil_call(self.client, 25, False)
-        except:
-            print('erro ao conectar')
-            #sys.exit(1)
-            return 0
-        #print()
+
+
 
         F1 = False
 
@@ -110,7 +116,11 @@ class Mainloop():
                     'problem': open('./problem.pddl', 'r').read()}
 
         # Send job request to solve endpoint.
-        solve_request_url=requests.post("https://solver.planning.domains:5001/package/lama-first/solve", json=req_body).json()
+        try:
+            solve_request_url=requests.post("https://solver.planning.domains:5001/package/lama-first/solve", json=req_body).json()
+        except Exception as err:
+            print('Erro ao obter a solução. Verifique a conexão com a internet')
+            raise err
 
         # Query the result in the job.
         celery_result=requests.post('https://solver.planning.domains:5001' + solve_request_url['result'], json={"adaptor":"planning_editor_adaptor"}  )
@@ -131,8 +141,8 @@ class Mainloop():
         try:
             solutionList = responseDict['plans'][0]['result']['plan']
         except:
-            print('Nao foi possivel obter a solucao. Verifique a conexão com a internet e tente novamente')
-
+            print('Erro ao obter a solução.')
+            return 1
         #Salvando a solucao completa contendo todas as acoes em um arquivo
         with open('./solution', 'w') as f:
             f.write('\n'.join([act['action'] for act in solutionList]))
@@ -292,30 +302,33 @@ class Mainloop():
                 #if not self.running:
                     return 0
 
-                self.table['liga_esteira'] = modbus.read_coil_call(self.client, 0)
-                self.table['anvanca_ap1'] = modbus.read_coil_call(self.client, 1)
-                self.table['anvanca_ap2'] = modbus.read_coil_call(self.client, 2)
 
-                self.table['anvanca_ap3'] = F1
-                self.table['retrai_ap3'] = not F1
+                current_table = {
+                    'liga_esteira': modbus.read_coil_call(self.client, self.coil_addr['liga_esteira']),
+                    'anvanca_ap1': modbus.read_coil_call(self.client, self.coil_addr['anvanca_ap1']),
+                    'anvanca_ap2': modbus.read_coil_call(self.client, self.coil_addr['anvanca_ap2']),
+                    'anvanca_ap3': F1,
+                    'retrai_ap3': not F1,
+                    'fc_1': modbus.read_coil_call(self.client, self.coil_addr['fc_1']),
+                    'fc_2': modbus.read_coil_call(self.client, self.coil_addr['fc_2']),
+                    'fc_3': modbus.read_coil_call(self.client, self.coil_addr['fc_3']),
+                    'fc_4': modbus.read_coil_call(self.client, self.coil_addr['fc_4']),
+                    'peca_peqnmet': modbus.read_coil_call(self.client, self.coil_addr['peca_peqnmet']),
+                    'peca_peqmet': modbus.read_coil_call(self.client, self.coil_addr['peca_peqmet']),
+                    'peca_mednmet': modbus.read_coil_call(self.client, self.coil_addr['peca_mednmet']),
+                    'peca_medmet': modbus.read_coil_call(self.client, self.coil_addr['peca_medmet']),
+                    'peca_grandnmet': modbus.read_coil_call(self.client, self.coil_addr['peca_grandnmet']),
+                    'peca_grandmet': modbus.read_coil_call(self.client, self.coil_addr['peca_grandmet'])
+                }
 
-                self.table['fc_1'] = modbus.read_coil_call(self.client, 14)
-                self.table['fc_2'] = modbus.read_coil_call(self.client, 15)
-                self.table['fc_3'] = modbus.read_coil_call(self.client, 16)
-                self.table['fc_4'] = modbus.read_coil_call(self.client, 17)
-                self.table['peca_peqnmet'] = modbus.read_coil_call(self.client, 20)
-                self.table['peca_peqmet'] = modbus.read_coil_call(self.client, 21)
-                self.table['peca_mednmet'] = modbus.read_coil_call(self.client, 22)
-                self.table['peca_medmet'] = modbus.read_coil_call(self.client, 23)
-                self.table['peca_grdnmet'] = modbus.read_coil_call(self.client, 24)
-                self.table['peca_grdmet'] = modbus.read_coil_call(self.client, 25)
+                self.set_table(current_table)
 
                 print('precondition Met?  ')
-                print(functions.compare_dicts(precondition_dict, self.table))
-                precondition_met = functions.compare_dicts(precondition_dict, self.table)
+                print(functions.compare_dicts(precondition_dict, self.get_table()))
+                precondition_met = functions.compare_dicts(precondition_dict, self.get_table())
 
                 print('\nprecondition we have:')
-                print(self.table)
+                print(self.get_table())
                 print('\nPrecondition needed: ')
                 print(precondition_dict)
                 print('-------')
@@ -326,56 +339,59 @@ class Mainloop():
                     return 0
 
                 if 'liga_esteira' in effect_dict:
-                    modbus.write_coil_call(self.client, 0, effect_dict['liga_esteira'])
+                    modbus.write_coil_call(self.client, self.coil_addr['liga_esteira'], effect_dict['liga_esteira'])
 
                 if 'anvanca_ap1' in effect_dict:
-                    modbus.write_coil_call(self.client, 1, effect_dict['anvanca_ap1'])
+                    modbus.write_coil_call(self.client, self.coil_addr['anvanca_ap1'], effect_dict['anvanca_ap1'])
 
                 if 'anvanca_ap2' in effect_dict:
-                    modbus.write_coil_call(self.client, 2, effect_dict['anvanca_ap2'])
+                    modbus.write_coil_call(self.client, self.coil_addr['anvanca_ap2'], effect_dict['anvanca_ap2'])
 
                 if 'anvanca_ap3' in effect_dict:
                     if (not F1 and effect_dict['anvanca_ap3'] == True):
                         print("extend pulse")
-                        modbus.write_coil_call(self.client, 3, True)
+                        modbus.write_coil_call(self.client, self.coil_addr['anvanca_ap3'], True)
                         time.sleep(0.1)
-                        modbus.write_coil_call(self.client, 3, False)
+                        modbus.write_coil_call(self.client, self.coil_addr['anvanca_ap3'], False)
                         F1 = True
                     elif (F1 and effect_dict['anvanca_ap3'] == False):
                         print("retract pulse")
-                        modbus.write_coil_call(self.client, 4, True)
+                        modbus.write_coil_call(self.client, self.coil_addr['retrai_ap3'], True)
                         time.sleep(0.1)
-                        modbus.write_coil_call(self.client, 4, False)
+                        modbus.write_coil_call(self.client, self.coil_addr['retrai_ap3'], False)
                         F1 = False
 
-                self.table['liga_esteira'] = modbus.read_coil_call(self.client, 0)
-                self.table['anvanca_ap1'] = modbus.read_coil_call(self.client, 1)
-                self.table['anvanca_ap2'] = modbus.read_coil_call(self.client, 2)
-                self.table['anvanca_ap3'] = F1
-                self.table['retrai_ap3'] = not F1
+                current_table = {
+                    'liga_esteira': modbus.read_coil_call(self.client, self.coil_addr['liga_esteira']),
+                    'anvanca_ap1': modbus.read_coil_call(self.client, self.coil_addr['anvanca_ap1']),
+                    'anvanca_ap2': modbus.read_coil_call(self.client, self.coil_addr['anvanca_ap2']),
+                    'anvanca_ap3': F1,
+                    'retrai_ap3': not F1,
+                    'fc_1': modbus.read_coil_call(self.client, self.coil_addr['fc_1']),
+                    'fc_2': modbus.read_coil_call(self.client, self.coil_addr['fc_2']),
+                    'fc_3': modbus.read_coil_call(self.client, self.coil_addr['fc_3']),
+                    'fc_4': modbus.read_coil_call(self.client, self.coil_addr['fc_4']),
+                    'peca_peqnmet': modbus.read_coil_call(self.client, self.coil_addr['peca_peqnmet']),
+                    'peca_peqmet': modbus.read_coil_call(self.client, self.coil_addr['peca_peqmet']),
+                    'peca_mednmet': modbus.read_coil_call(self.client, self.coil_addr['peca_mednmet']),
+                    'peca_medmet': modbus.read_coil_call(self.client, self.coil_addr['peca_medmet']),
+                    'peca_grandnmet': modbus.read_coil_call(self.client, self.coil_addr['peca_grandnmet']),
+                    'peca_grandmet': modbus.read_coil_call(self.client, self.coil_addr['peca_grandmet'])
+                }
 
-                self.table['fc_1'] = modbus.read_coil_call(self.client, 14)
-                self.table['fc_2'] = modbus.read_coil_call(self.client, 15)
-                self.table['fc_3'] = modbus.read_coil_call(self.client, 16)
-                self.table['fc_4'] = modbus.read_coil_call(self.client, 17)
-                self.table['peca_peqnmet'] = modbus.read_coil_call(self.client, 20)
-                self.table['peca_peqmet'] = modbus.read_coil_call(self.client, 21)
-                self.table['peca_mednmet'] = modbus.read_coil_call(self.client, 22)
-                self.table['peca_medmet'] = modbus.read_coil_call(self.client, 23)
-                self.table['peca_grdnmet'] = modbus.read_coil_call(self.client, 24)
-                self.table['peca_grdmet'] = modbus.read_coil_call(self.client, 25)
+                self.set_table(current_table)
 
                 print('Effect Met?  ')
-                print(functions.compare_dicts(effect_dict, self.table))
-                effect_met = functions.compare_dicts(effect_dict, self.table)
+                print(functions.compare_dicts(effect_dict, self.get_table()))
+                effect_met = functions.compare_dicts(effect_dict, self.get_table())
 
                 print('\nprecondition we have:')
-                print(self.table)
+                print(self.get_table())
                 print('\nPrecondition needed: ')
                 print(effect_dict)
                 print('-------')
-
             print("\n-------------------------------------")
+        return 2
 
 
 
