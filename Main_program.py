@@ -55,8 +55,8 @@ class Mainloop():
             'peca_peqmet': 21,
             'peca_mednmet': 22,
             'peca_medmet': 23,
-            'peca_grandnmet': 24,
-            'peca_grandmet': 25
+            'peca_grdnmet': 24,
+            'peca_grdmet': 25
         }
 
         #Flags de status de funcionamento
@@ -64,15 +64,19 @@ class Mainloop():
         self.state = True
         self.running = False
         self.stop = False
+        self.precondition_dict = {}
 
+    def setprecondition_dict(self, dict):
+        self.precondition_dict = dict
 
+    def getprecondition_dict(self):
+        return self.precondition_dict
 
     def get_table(self):
         return self.table
 
     def set_table(self, table):
         self.table = table
-
 
     def pause(self):
         self.state = False
@@ -99,6 +103,7 @@ class Mainloop():
         #Cria o cliente modbus com o ip fornecido.
         #print(self.client.connected)
         self.client.connect()
+        self.reset()
 
         #print(self.client.connected)
 
@@ -294,6 +299,7 @@ class Mainloop():
 
             print("\nPrecondition dict: ")
             print(precondition_dict)
+            self.setprecondition_dict(precondition_dict)
             print("\nEffect dict: ")
             print(effect_dict)
             # print("preconditionlist:\n")
@@ -322,8 +328,8 @@ class Mainloop():
                     'peca_peqmet': modbus.read_coil_call(self.client, self.coil_addr['peca_peqmet']),
                     'peca_mednmet': modbus.read_coil_call(self.client, self.coil_addr['peca_mednmet']),
                     'peca_medmet': modbus.read_coil_call(self.client, self.coil_addr['peca_medmet']),
-                    'peca_grandnmet': modbus.read_coil_call(self.client, self.coil_addr['peca_grandnmet']),
-                    'peca_grandmet': modbus.read_coil_call(self.client, self.coil_addr['peca_grandmet'])
+                    'peca_grdnmet': modbus.read_coil_call(self.client, self.coil_addr['peca_grdnmet']),
+                    'peca_grdmet': modbus.read_coil_call(self.client, self.coil_addr['peca_grdmet'])
                 }
 
                 self.set_table(current_table)
@@ -332,7 +338,7 @@ class Mainloop():
                 print(functions.compare_dicts(precondition_dict, self.get_table()))
                 precondition_met = functions.compare_dicts(precondition_dict, self.get_table())
 
-                print('\nprecondition we have:')
+                print('\nCondition we have:')
                 print(self.get_table())
                 print('\nPrecondition needed: ')
                 print(precondition_dict)
@@ -381,8 +387,8 @@ class Mainloop():
                     'peca_peqmet': modbus.read_coil_call(self.client, self.coil_addr['peca_peqmet']),
                     'peca_mednmet': modbus.read_coil_call(self.client, self.coil_addr['peca_mednmet']),
                     'peca_medmet': modbus.read_coil_call(self.client, self.coil_addr['peca_medmet']),
-                    'peca_grandnmet': modbus.read_coil_call(self.client, self.coil_addr['peca_grandnmet']),
-                    'peca_grandmet': modbus.read_coil_call(self.client, self.coil_addr['peca_grandmet'])
+                    'peca_grdnmet': modbus.read_coil_call(self.client, self.coil_addr['peca_grdnmet']),
+                    'peca_grdmet': modbus.read_coil_call(self.client, self.coil_addr['peca_grdmet'])
                 }
 
                 self.set_table(current_table)
@@ -391,7 +397,7 @@ class Mainloop():
                 print(functions.compare_dicts(effect_dict, self.get_table()))
                 effect_met = functions.compare_dicts(effect_dict, self.get_table())
 
-                print('\nprecondition we have:')
+                print('\nCondition we have:')
                 print(self.get_table())
                 print('\nPrecondition needed: ')
                 print(effect_dict)

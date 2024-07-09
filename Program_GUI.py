@@ -35,6 +35,14 @@ class Main_program_ThreadClient(Mainloop):
         with self.lock:
             return self.running
 
+    def setprecondition_dict(self, dict):
+        with self.lock:
+            self.precondition_dict = dict
+
+    def getprecondition_dict(self):
+        with self.lock:
+            return self.precondition_dict
+
     def run(self):
         self.finalizado = False
         try:
@@ -46,6 +54,7 @@ class Main_program_ThreadClient(Mainloop):
         else:
             if self.finalizado:
                 return 2
+
 
 #!/usr/bin/python3
 import tkinter as tk
@@ -65,13 +74,15 @@ class aUI:
         self.thread_client = None
         self.client_instance = None
         self.que = Queue()
+        self.precondition_dict = {}
+        self.table = {}
 
         # build ui
         tk2 = tk.Tk(master)
 
-        default = []
+        self.default = []
         for x in range(18):
-            default.append(tk.IntVar(tk2, 0))
+            self.default.append(tk.IntVar(tk2, 0))
 
         tk2.configure(height=720, width=1280)
         self.frame3 = ttk.Frame(tk2)
@@ -120,64 +131,64 @@ class aUI:
         label7.configure(text='Caixa de descarte 1')
         label7.grid(column=1, row=0)
         self.spinbox2 = tk.Spinbox(labelframe2)
-        self.spinbox2.configure(from_=0, to=99, textvariable=default[0],width=6)
+        self.spinbox2.configure(from_=0, to=99, textvariable=self.default[0],width=6)
         self.spinbox2.grid(column=1, row=1)
         self.spinbox3 = tk.Spinbox(labelframe2)
-        self.spinbox3.configure(from_=0, to=99, textvariable=default[1],width=6)
+        self.spinbox3.configure(from_=0, to=99, textvariable=self.default[1],width=6)
         self.spinbox3.grid(column=1, row=2)
         self.spinbox4 = tk.Spinbox(labelframe2)
-        self.spinbox4.configure(from_=0, to=99, textvariable=default[2],width=6)
+        self.spinbox4.configure(from_=0, to=99, textvariable=self.default[2],width=6)
         self.spinbox4.grid(column=1, row=3)
         self.spinbox5 = tk.Spinbox(labelframe2)
-        self.spinbox5.configure(from_=0, to=99, textvariable=default[3],width=6)
+        self.spinbox5.configure(from_=0, to=99, textvariable=self.default[3],width=6)
         self.spinbox5.grid(column=1, row=4)
         self.spinbox6 = tk.Spinbox(labelframe2)
-        self.spinbox6.configure(from_=0, to=99, textvariable=default[4],width=6)
+        self.spinbox6.configure(from_=0, to=99, textvariable=self.default[4],width=6)
         self.spinbox6.grid(column=1, row=5)
         self.spinbox7 = tk.Spinbox(labelframe2)
-        self.spinbox7.configure(from_=0, to=99, textvariable=default[5],width=6)
+        self.spinbox7.configure(from_=0, to=99, textvariable=self.default[5],width=6)
         self.spinbox7.grid(column=1, row=6)
         label8 = tk.Label(labelframe2)
         label8.configure(text='Caixa de descarte 2')
         label8.grid(column=2, padx=17, row=0)
         self.spinbox8 = tk.Spinbox(labelframe2)
-        self.spinbox8.configure(from_=0, to=99, textvariable=default[6],width=6)
+        self.spinbox8.configure(from_=0, to=99, textvariable=self.default[6],width=6)
         self.spinbox8.grid(column=2, row=1)
         self.spinbox9 = tk.Spinbox(labelframe2)
-        self.spinbox9.configure(from_=0, to=99, textvariable=default[7],width=6)
+        self.spinbox9.configure(from_=0, to=99, textvariable=self.default[7],width=6)
         self.spinbox9.grid(column=2, row=2)
         self.spinbox10 = tk.Spinbox(labelframe2)
-        self.spinbox10.configure(from_=0, to=99, textvariable=default[8],width=6)
+        self.spinbox10.configure(from_=0, to=99, textvariable=self.default[8],width=6)
         self.spinbox10.grid(column=2, row=3)
         self.spinbox11 = tk.Spinbox(labelframe2)
-        self.spinbox11.configure(from_=0, to=99, textvariable=default[9],width=6)
+        self.spinbox11.configure(from_=0, to=99, textvariable=self.default[9],width=6)
         self.spinbox11.grid(column=2, row=4)
         self.spinbox12 = tk.Spinbox(labelframe2)
-        self.spinbox12.configure(from_=0, to=99, textvariable=default[10],width=6)
+        self.spinbox12.configure(from_=0, to=99, textvariable=self.default[10],width=6)
         self.spinbox12.grid(column=2, row=5)
         self.spinbox13 = tk.Spinbox(labelframe2)
-        self.spinbox13.configure(from_=0, to=99, textvariable=default[11],width=6)
+        self.spinbox13.configure(from_=0, to=99, textvariable=self.default[11],width=6)
         self.spinbox13.grid(column=2, row=6)
         label9 = tk.Label(labelframe2)
         label9.configure(text='Caixa de descarte 3')
         label9.grid(column=3, row=0)
         self.spinbox14 = tk.Spinbox(labelframe2)
-        self.spinbox14.configure(from_=0, to=99, textvariable=default[12],width=6)
+        self.spinbox14.configure(from_=0, to=99, textvariable=self.default[12],width=6)
         self.spinbox14.grid(column=3, row=1)
         self.spinbox15 = tk.Spinbox(labelframe2)
-        self.spinbox15.configure(from_=0, to=99, textvariable=default[13],width=6)
+        self.spinbox15.configure(from_=0, to=99, textvariable=self.default[13],width=6)
         self.spinbox15.grid(column=3, row=2)
         self.spinbox16 = tk.Spinbox(labelframe2)
-        self.spinbox16.configure(from_=0, to=99, textvariable=default[14],width=6)
+        self.spinbox16.configure(from_=0, to=99, textvariable=self.default[14],width=6)
         self.spinbox16.grid(column=3, row=3)
         self.spinbox17 = tk.Spinbox(labelframe2)
-        self.spinbox17.configure(from_=0, to=99, textvariable=default[15],width=6)
+        self.spinbox17.configure(from_=0, to=99, textvariable=self.default[15],width=6)
         self.spinbox17.grid(column=3, row=4)
         self.spinbox18 = tk.Spinbox(labelframe2)
-        self.spinbox18.configure(from_=0, to=99, textvariable=default[16],width=6)
+        self.spinbox18.configure(from_=0, to=99, textvariable=self.default[16],width=6)
         self.spinbox18.grid(column=3, row=5)
         self.spinbox19 = tk.Spinbox(labelframe2)
-        self.spinbox19.configure(from_=0, to=99, textvariable=default[17],width=6)
+        self.spinbox19.configure(from_=0, to=99, textvariable=self.default[17],width=6)
         self.spinbox19.grid(column=3, row=6)
         labelframe2.grid(column=0, row=0)
         labelframe4 = ttk.Labelframe(frame5)
@@ -192,7 +203,7 @@ class aUI:
         self.button3.configure(text='Parar/Reprogamar', command=self.parar)
         self.button3.pack(expand=True, side="top")
         button4 = ttk.Button(labelframe4)
-        button4.configure(text='Desconectar', command=self.desconectar)
+        button4.configure(text='Voltar', command=self.desconectar)
         button4.pack(expand=True, side="top")
         labelframe4.grid(column=2, padx=25, row=0)
         labelframe4.pack_propagate(0)
@@ -294,12 +305,15 @@ class aUI:
         #if self.client_instance is not None:
         #    print(self.client_instance.finalizado)
 
+
         if not self.que.empty():
             if self.que.get() == 2:
                 self.text1.configure(state="normal")
                 self.text1.insert(tk.END, "Plano finalizado com sucesso\n")
                 self.text1.see(tk.END)
                 self.text1.configure(state="disabled")
+                for value in range(18):
+                    self.default[value].set(0)
 
         if self.thread_client is not None and self.thread_client.is_alive():
             self.spinbox2.configure(state=tk.DISABLED)
@@ -344,6 +358,55 @@ class aUI:
             self.button2.configure(state=tk.NORMAL)
             self.button3.configure(state=tk.DISABLED)
 
+        # Verificando mudancas o estado das peças
+        if self.client_instance is not None:
+            new_precondition_dict = self.client_instance.getprecondition_dict()
+            pecas = ['peca_peqnmet', 'peca_peqmet', 'peca_mednmet', 'peca_media', 'peca_grdnmet', 'peca_grdmet']
+            for key in pecas:
+                if key not in self.precondition_dict and key in new_precondition_dict:
+                    self.text1.configure(state="normal")
+                    self.text1.insert(tk.END, "Insira a próxima peça: ")
+                    match key:
+                        case 'peca_peqnmet':
+                            self.text1.insert(tk.END, "Pequena não Metálica\n")
+                        case 'peca_peqmet':
+                            self.text1.insert(tk.END, "Pequena Metálica\n")
+                        case 'peca_mednmet':
+                            self.text1.insert(tk.END, "Média não Metálica\n")
+                        case 'peca_medmet':
+                            self.text1.insert(tk.END, "Média Metálica\n")
+                        case 'peca_grdnmet':
+                            self.text1.insert(tk.END, "Grande não Metálica\n")
+                        case 'peca_grdmet':
+                            self.text1.insert(tk.END, "Grande Metálica\n")
+                    self.text1.see(tk.END)
+                    self.text1.configure(state="disabled")
+
+
+            new_table = self.client_instance.get_table()
+            fc = ['fc_1', 'fc_2', 'fc_3']
+            for key in fc:
+                if key in self.table and new_table:
+                    if self.table[key] is False and new_table[key] is True:
+                        self.text1.configure(state="normal")
+                        self.text1.insert(tk.END, "Peça recebida na caixa ")
+                        match key:
+                            case 'fc_1':
+                                self.text1.insert(tk.END, "1\n")
+                            case 'fc_2':
+                                self.text1.insert(tk.END, "2\n")
+                            case 'fc_3':
+                                self.text1.insert(tk.END, "3\n")
+
+
+
+            self.table = new_table
+            self.precondition_dict = new_precondition_dict
+
+        self.UpdateCanvas()
+
+
+
         '''
         if self.thread_client is not None:
             if self.thread_client.is_alive() and self.client_instance.client.connected:
@@ -360,8 +423,6 @@ class aUI:
 
         #self.f1 = not self.f1
         #print(threading.enumerate(),'\n')
-
-        self.UpdateCanvas()
 
 
 
@@ -663,7 +724,8 @@ class aUI:
 
     def UpdateCanvas(self):
         if self.client_instance is not None:
-            if self.client_instance.get_table()['liga_esteira'] and self.thread_client.is_alive():
+            table = self.client_instance.get_table()
+            if table['liga_esteira'] and self.thread_client.is_alive():
                 self.canvas1.itemconfigure(self.belt_id, state=tk.HIDDEN)
                 self.canvas1.itemconfig(self.belt_moving_id, image=self.belt_moving_frames[self.frame_index])
                 self.frame_index = (self.frame_index + 1) % len(self.belt_moving_frames)
@@ -672,21 +734,21 @@ class aUI:
                 self.canvas1.itemconfigure(self.belt_moving_id, state=tk.HIDDEN)
                 self.canvas1.itemconfigure(self.belt_id, state=tk.NORMAL)
 
-            if self.client_instance.get_table()['anvanca_ap1']:
+            if table['anvanca_ap1']:
                 self.canvas1.itemconfigure(self.expiston1_id, state=tk.NORMAL)
                 self.canvas1.itemconfigure(self.piston1_id, state=tk.HIDDEN)
             else:
                 self.canvas1.itemconfigure(self.expiston1_id, state=tk.HIDDEN)
                 self.canvas1.itemconfigure(self.piston1_id, state=tk.NORMAL)
 
-            if self.client_instance.get_table()['anvanca_ap2']:
+            if table['anvanca_ap2']:
                 self.canvas1.itemconfigure(self.expiston2_id, state=tk.NORMAL)
                 self.canvas1.itemconfigure(self.piston2_id, state=tk.HIDDEN)
             else:
                 self.canvas1.itemconfigure(self.expiston2_id, state=tk.HIDDEN)
                 self.canvas1.itemconfigure(self.piston2_id, state=tk.NORMAL)
 
-            if self.client_instance.get_table()['anvanca_ap3']:
+            if table['anvanca_ap3']:
                 self.canvas1.itemconfigure(self.expiston3_id, state=tk.NORMAL)
                 self.canvas1.itemconfigure(self.piston3_id, state=tk.HIDDEN)
             else:
