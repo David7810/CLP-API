@@ -73,7 +73,44 @@ class aUI:
         self.ip = None
         self.thread_client = None
         self.client_instance = None
-        self.que = Queue()
+        self.end_que = Queue()
+        self.pecas_que = Queue()
+        self.descartando_pecaincorreta = False
+
+        #Armazena a quantidade de peças em cada caixa
+        self.caixa_descarte1 = {
+            'peca_peqnmet': 0,
+            'peca_peqmet': 0,
+            'peca_mednmet': 0,
+            'peca_medmet': 0,
+            'peca_grdnmet': 0,
+            'peca_grdmet': 0
+        }
+        self.caixa_descarte2 = {
+            'peca_peqnmet': 0,
+            'peca_peqmet': 0,
+            'peca_mednmet': 0,
+            'peca_medmet': 0,
+            'peca_grdnmet': 0,
+            'peca_grdmet': 0
+        }
+        self.caixa_descarte3 = {
+            'peca_peqnmet': 0,
+            'peca_peqmet': 0,
+            'peca_mednmet': 0,
+            'peca_medmet': 0,
+            'peca_grdnmet': 0,
+            'peca_grdmet': 0
+        }
+        self.caixa_descarte4 = {
+            'peca_peqnmet': 0,
+            'peca_peqmet': 0,
+            'peca_mednmet': 0,
+            'peca_medmet': 0,
+            'peca_grdnmet': 0,
+            'peca_grdmet': 0
+        }
+
         self.precondition_dict = {}
         self.table = {}
 
@@ -306,8 +343,8 @@ class aUI:
         #    print(self.client_instance.finalizado)
 
 
-        if not self.que.empty():
-            if self.que.get() == 2:
+        if not self.end_que.empty():
+            if self.end_que.get() == 2:
                 self.text1.configure(state="normal")
                 self.text1.insert(tk.END, "Plano finalizado com sucesso\n")
                 self.text1.see(tk.END)
@@ -358,10 +395,11 @@ class aUI:
             self.button2.configure(state=tk.NORMAL)
             self.button3.configure(state=tk.DISABLED)
 
-        # Verificando mudancas o estado das peças
+        # Informaçao sobre proxima peça a ser inserida e peça chegando
         if self.client_instance is not None:
             new_precondition_dict = self.client_instance.getprecondition_dict()
-            pecas = ['peca_peqnmet', 'peca_peqmet', 'peca_mednmet', 'peca_media', 'peca_grdnmet', 'peca_grdmet']
+            new_table = self.client_instance.get_table()
+            pecas = ['peca_peqnmet', 'peca_peqmet', 'peca_mednmet', 'peca_medmet', 'peca_grdnmet', 'peca_grdmet']
             for key in pecas:
                 if key not in self.precondition_dict and key in new_precondition_dict:
                     self.text1.configure(state="normal")
@@ -382,23 +420,92 @@ class aUI:
                     self.text1.see(tk.END)
                     self.text1.configure(state="disabled")
 
-
-            new_table = self.client_instance.get_table()
-            fc = ['fc_1', 'fc_2', 'fc_3']
-            for key in fc:
-                if key in self.table and new_table:
+                #Identifica nova peça detectada
+                if key in self.table and key in new_table:
                     if self.table[key] is False and new_table[key] is True:
+                        self.pecas_que.put(key)
+                        self.text1.configure(state="normal")
+                        match key:
+                            case 'peca_peqnmet':
+                                self.text1.insert(tk.END, "Peça detectada: Pequena não Metálica\n")
+                            case 'peca_peqmet':
+                                self.text1.insert(tk.END, "Peça detectada: Pequena Metálica\n")
+                            case 'peca_mednmet':
+                                self.text1.insert(tk.END, "Peça detectada: Média não Metálica\n")
+                            case 'peca_medmet':
+                                self.text1.insert(tk.END, "Peça detectada: Média Metálica\n")
+                            case 'peca_grdnmet':
+                                self.text1.insert(tk.END, "Peça detectada: Grande não Metálica\n")
+                            case 'peca_grdmet':
+                                self.text1.insert(tk.END, "Peça detectada: Grande Metálica\n")
+                        self.text1.configure(state="disabled")
+
+            #Detecta peça chegando na caixa de descarte
+            fc = ['fc_1', 'fc_2', 'fc_3', 'fc_4']
+            for key in fc:
+                if key in self.table and key in new_table:
+                    if self.table[key] is False and new_table[key] is True and not self.pecas_que.empty():
                         self.text1.configure(state="normal")
                         self.text1.insert(tk.END, "Peça recebida na caixa ")
+                        peca = self.pecas_que.get()
                         match key:
                             case 'fc_1':
                                 self.text1.insert(tk.END, "1\n")
+                                self.caixa_descarte1[peca] = self.caixa_descarte1[peca] + 1
+                                #s =('peça '+ peca + 'chegou na caixa1\n')
+                                #self.text1.insert(tk.END, s)
+                                #s = ('quantidade de pecas do tipo ' + peca + ' na caixa 1:' + str(self.caixa_descarte1[peca])+'\n')
+                                #self.text1.insert(tk.END, s)
                             case 'fc_2':
                                 self.text1.insert(tk.END, "2\n")
+                                self.caixa_descarte2[peca] = self.caixa_descarte2[peca] + 1
+                                #s =('peça ' + peca + 'chegou na caixa2')
+                                #self.text1.insert(tk.END, s)
+                                #s = ('quantidade de pecas do tipo ' + peca + ' na caixa 2:' + str(self.caixa_descarte2[peca])+'\n')
+                                #self.text1.insert(tk.END, s)
                             case 'fc_3':
                                 self.text1.insert(tk.END, "3\n")
+                                #self.caixa_descarte3[peca] = self.caixa_descarte3[peca] + 1
+                                #s = ('peça ' + peca + 'chegou na caixa3')
+                                #self.text1.insert(tk.END, s)
+                                #s = ('quantidade de pecas do tipo ' + peca + ' na caixa 3:' + str(self.caixa_descarte3[peca])+'\n')
+                                self.text1.insert(tk.END, s)
+                            case 'fc_4':
+                                self.text1.insert(tk.END, "4\n")
+                                self.caixa_descarte4[peca] = self.caixa_descarte4[peca] + 1
+                                #s = ('peça ' + peca + 'chegou na caixa4')
+                                #self.text1.insert(tk.END, s)
+                                #s = ('quantidade de pecas do tipo ' + peca + ' na caixa 4:' + str(self.caixa_descarte4[peca])+'\n')
+                                #self.text1.insert(tk.END, s)
+                                self.descartando_pecaincorreta = False
+                        self.text1.configure(state="disabled")
 
-
+            '''
+            #Detecta peça incorreta inserida
+            if not self.pecas_que.empty():
+                if self.pecas_que.queue[0] in self.table and not self.descartando_pecaincorreta:
+                    #if self.table[self.pecas_que.queue[0]] is True:
+                    pecas = ['peca_peqnmet', 'peca_peqmet', 'peca_mednmet', 'peca_medmet', 'peca_grdnmet', 'peca_grdmet']
+                    pecas_err = [item for item in pecas if item != self.pecas_que.queue[0]]
+                    for key3 in pecas_err:
+                        if self.table[key3] is True:
+                            self.text1.configure(state="normal")
+                            self.text1.insert(tk.END, "Peça incorreta. Descartando.\n")
+                            self.text1.configure(state="disabled")
+                            self.descartando_pecaincorreta = True
+            '''
+            # Detecta peça incorreta inserida
+            pecas = ['peca_peqnmet', 'peca_peqmet', 'peca_mednmet', 'peca_medmet', 'peca_grdnmet', 'peca_grdmet']
+            for key3 in pecas:
+                if key3 in self.precondition_dict:
+                    pecas_err = [item for item in pecas if item != key3]
+                    for key4 in pecas_err:
+                        if self.table[key4] is True and not self.descartando_pecaincorreta:
+                            self.text1.configure(state="normal")
+                            self.text1.insert(tk.END, "Peça incorreta. Descartando.\n")
+                            self.text1.see(tk.END)
+                            self.text1.configure(state="disabled")
+                            self.descartando_pecaincorreta = True
 
             self.table = new_table
             self.precondition_dict = new_precondition_dict
@@ -457,7 +564,7 @@ class aUI:
         self.text1.see(tk.END)
         self.text1.configure(state="disabled")
         #self.thread_client = threading.Thread(target=lambda a: a.run(), args=([self.client_instance]))
-        self.thread_client = threading.Thread(target=lambda q, a: q.put(a.run()), args=(self.que, self.client_instance))
+        self.thread_client = threading.Thread(target=lambda q, a: q.put(a.run()), args=(self.end_que, self.client_instance))
         self.thread_client.start()
 
     def parar(self):
@@ -467,6 +574,8 @@ class aUI:
         self.text1.insert(tk.END, "Parando\n")
         self.text1.see(tk.END)
         self.text1.configure(state="disabled")
+        while not self.pecas_que.empty():
+            self.pecas_que.get()
     def desconectar(self):
         if self.client_instance is not None:
             self.client_instance.stop1()
