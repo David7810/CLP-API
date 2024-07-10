@@ -584,32 +584,35 @@ class aUI:
     def generate_problem(self):
         # Armazena as informacoes sobre o problema desejado
         items = {
-            'cx1_peq_metal': self.spinbox2.get(),
-            'cx1_med_metal': self.spinbox3.get(),
-            'cx1_grd_metal': self.spinbox4.get(),
-            'cx1_peq': self.spinbox5.get(),
-            'cx1_med': self.spinbox6.get(),
-            'cx1_grd': self.spinbox7.get(),
+            'cx1_peq_metal': int(self.spinbox2.get()) - self.caixa_descarte1['peca_peqmet'],
+            'cx1_med_metal': int(self.spinbox3.get()) - self.caixa_descarte1['peca_medmet'],
+            'cx1_grd_metal': int(self.spinbox4.get()) - self.caixa_descarte1['peca_grdmet'],
+            'cx1_peq': int(self.spinbox5.get()) - self.caixa_descarte1['peca_peqnmet'],
+            'cx1_med': int(self.spinbox6.get()) - self.caixa_descarte1['peca_mednmet'],
+            'cx1_grd': int(self.spinbox7.get()) - self.caixa_descarte1['peca_grdnmet'],
 
-            'cx2_peq_metal': self.spinbox8.get(),
-            'cx2_med_metal': self.spinbox9.get(),
-            'cx2_grd_metal': self.spinbox10.get(),
-            'cx2_peq': self.spinbox11.get(),
-            'cx2_med': self.spinbox12.get(),
-            'cx2_grd': self.spinbox13.get(),
+            'cx2_peq_metal': int(self.spinbox8.get()) - self.caixa_descarte2['peca_peqmet'],
+            'cx2_med_metal': int(self.spinbox9.get()) - self.caixa_descarte2['peca_medmet'],
+            'cx2_grd_metal': int(self.spinbox10.get()) - self.caixa_descarte2['peca_grdmet'],
+            'cx2_peq': int(self.spinbox11.get()) - self.caixa_descarte2['peca_peqnmet'],
+            'cx2_med': int(self.spinbox12.get()) - self.caixa_descarte2['peca_mednmet'],
+            'cx2_grd': int(self.spinbox13.get()) - self.caixa_descarte2['peca_grdnmet'],
 
-            'cx3_peq_metal': self.spinbox14.get(),
-            'cx3_med_metal': self.spinbox15.get(),
-            'cx3_grd_metal': self.spinbox16.get(),
-            'cx3_peq': self.spinbox17.get(),
-            'cx3_med': self.spinbox18.get(),
-            'cx3_grd': self.spinbox19.get()
+            'cx3_peq_metal': int(self.spinbox14.get()) - self.caixa_descarte3['peca_peqmet'],
+            'cx3_med_metal': int(self.spinbox15.get()) - self.caixa_descarte3['peca_medmet'],
+            'cx3_grd_metal': int(self.spinbox16.get()) - self.caixa_descarte3['peca_grdmet'],
+            'cx3_peq': int(self.spinbox17.get()) - self.caixa_descarte3['peca_peqnmet'],
+            'cx3_med': int(self.spinbox18.get()) - self.caixa_descarte3['peca_mednmet'],
+            'cx3_grd': int(self.spinbox19.get()) - self.caixa_descarte3['peca_grdnmet']
         }
+        for key in items:
+            if items[key] < 0:
+                items[key]=0
 
         # Gerando o problema a partir das informacoes inseridas
         lines = []
-        for keys in items:
-            items[keys] = int(items[keys])
+        #for keys in items:
+            #items[keys] = int(items[keys])
 
         n_box1 = items['cx1_peq_metal'] + items['cx1_med_metal'] + items['cx1_grd_metal'] + items['cx1_peq'] + items[
             'cx1_med'] + items['cx1_grd']
