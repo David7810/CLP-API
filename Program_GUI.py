@@ -69,7 +69,6 @@ import tkinter.ttk as ttk
 class aUI:
     def __init__(self, master=None):
 
-        #self.thread_client = Main_program_ThreadClient()
         self.ip = None
         self.thread_client = None
         self.client_instance = None
@@ -123,7 +122,7 @@ class aUI:
 
         tk2.configure(height=720, width=1280)
         self.frame3 = ttk.Frame(tk2)
-        self.frame3.configure(height=720, width=1280)
+        self.frame3.configure(height=250, width=1280)
         message3 = tk.Message(self.frame3)
         message3.configure(text='Digite o IP do CLP', width=100)
         message3.pack(anchor="center", pady=20, side="top")
@@ -135,10 +134,10 @@ class aUI:
         self.frame3.grid(column=0, row=0)
         self.frame3.pack_propagate(0)
         self.frame6 = ttk.Frame(tk2)
-        self.frame6.configure(height=720, width=1280)
-        self.canvas1 = tk.Canvas(self.frame6)
-        self.canvas1.configure(height=450, state="normal", width=1152)
-        self.canvas1.pack(padx=20, pady=20, side="top")
+        self.frame6.configure(height=250, width=1280)
+        #self.canvas1 = tk.Canvas(self.frame6)
+        #self.canvas1.configure(height=450, state="normal", width=1152)
+        #self.canvas1.pack(padx=20, pady=20, side="top")
         frame5 = ttk.Frame(self.frame6)
         frame5.configure(height=200, width=200)
         labelframe2 = ttk.Labelframe(frame5)
@@ -259,42 +258,6 @@ class aUI:
 
         #Carrega a ilustracao
 
-        self.expiston = tk.PhotoImage(file='./assets/expiston.gif')
-        self.piston = tk.PhotoImage(file='./assets/piston.gif')
-        self.gndmet = tk.PhotoImage(file='./assets/gndmet.gif')
-        self.medmet = tk.PhotoImage(file='./assets/medmet.gif')
-        self.peqmet = tk.PhotoImage(file='./assets/peqnmet.gif')
-        self.gndnmet = tk.PhotoImage(file='./assets/gndnmet.gif')
-        self.mednmet = tk.PhotoImage(file='./assets/mednmet.gif')
-        self.peqnmet = tk.PhotoImage(file='./assets/peqnmet.gif')
-        self.peqmet_id = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.peqmet)
-        self.medmet_id = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.medmet)
-        self.gndmet_id = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.gndmet)
-        self.gndnmet_id = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.gndnmet)
-        self.mednmet_id = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.mednmet)
-        self.peqnmet_id = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.peqnmet)
-        self.piston1_id = self.canvas1.create_image(345, 15, anchor=tk.NW, image=self.piston)
-        self.piston2_id = self.canvas1.create_image(575, 15, anchor=tk.NW, image=self.piston)
-        self.piston3_id = self.canvas1.create_image(785, 15, anchor=tk.NW, image=self.piston)
-        self.expiston1_id = self.canvas1.create_image(345, 15, anchor=tk.NW, image=self.expiston)
-        self.expiston2_id = self.canvas1.create_image(575, 15, anchor=tk.NW, image=self.expiston)
-        self.expiston3_id = self.canvas1.create_image(785, 15, anchor=tk.NW, image=self.expiston)
-
-
-        self.belt = tk.PhotoImage(file='./assets/belt.gif')
-        self.belt_moving_frames = self.load_gif_frames('./assets/belt_moving.gif')
-        self.belt_id = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.belt)
-        self.belt_moving_id = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.belt_moving_frames[0])
-        self.frame_index = 0
-        self.canvas1.tag_raise(self.piston1_id)
-        self.canvas1.tag_raise(self.piston2_id)
-        self.canvas1.tag_raise(self.piston3_id)
-        self.canvas1.tag_raise(self.expiston1_id)
-        self.canvas1.tag_raise(self.expiston2_id)
-        self.canvas1.tag_raise(self.expiston3_id)
-        self.canvas1.itemconfigure(self.expiston1_id, state=tk.HIDDEN)
-        self.canvas1.itemconfigure(self.expiston2_id, state=tk.HIDDEN)
-        self.canvas1.itemconfigure(self.expiston3_id, state=tk.HIDDEN)
 
         self.frame3.tkraise()
 
@@ -317,18 +280,7 @@ class aUI:
         close_button = tk.Button(window, text="Fechar", command=window.destroy)
         close_button.pack(pady=10)
 
-    def load_gif_frames(self, file_path):
-        frames = []
-        image = tk.PhotoImage(file=file_path)
-        try:
-            i = 0
-            while True:
-                frames.append(image.subsample(1, 1).copy())
-                i += 1
-                image = tk.PhotoImage(file=file_path, format=f"gif -index {i}")
-        except:
-            pass
-        return frames
+
 
 
 
@@ -438,6 +390,7 @@ class aUI:
                                 self.text1.insert(tk.END, "Peça detectada: Grande não Metálica\n")
                             case 'peca_grdmet':
                                 self.text1.insert(tk.END, "Peça detectada: Grande Metálica\n")
+                        self.text1.see(tk.END)
                         self.text1.configure(state="disabled")
 
             #Detecta peça chegando na caixa de descarte
@@ -469,7 +422,7 @@ class aUI:
                                 #s = ('peça ' + peca + 'chegou na caixa3')
                                 #self.text1.insert(tk.END, s)
                                 #s = ('quantidade de pecas do tipo ' + peca + ' na caixa 3:' + str(self.caixa_descarte3[peca])+'\n')
-                                self.text1.insert(tk.END, s)
+                                #self.text1.insert(tk.END, s)
                             case 'fc_4':
                                 self.text1.insert(tk.END, "4\n")
                                 self.caixa_descarte4[peca] = self.caixa_descarte4[peca] + 1
@@ -478,22 +431,10 @@ class aUI:
                                 #s = ('quantidade de pecas do tipo ' + peca + ' na caixa 4:' + str(self.caixa_descarte4[peca])+'\n')
                                 #self.text1.insert(tk.END, s)
                                 self.descartando_pecaincorreta = False
+                        self.text1.see(tk.END)
                         self.text1.configure(state="disabled")
 
-            '''
-            #Detecta peça incorreta inserida
-            if not self.pecas_que.empty():
-                if self.pecas_que.queue[0] in self.table and not self.descartando_pecaincorreta:
-                    #if self.table[self.pecas_que.queue[0]] is True:
-                    pecas = ['peca_peqnmet', 'peca_peqmet', 'peca_mednmet', 'peca_medmet', 'peca_grdnmet', 'peca_grdmet']
-                    pecas_err = [item for item in pecas if item != self.pecas_que.queue[0]]
-                    for key3 in pecas_err:
-                        if self.table[key3] is True:
-                            self.text1.configure(state="normal")
-                            self.text1.insert(tk.END, "Peça incorreta. Descartando.\n")
-                            self.text1.configure(state="disabled")
-                            self.descartando_pecaincorreta = True
-            '''
+
             # Detecta peça incorreta inserida
             pecas = ['peca_peqnmet', 'peca_peqmet', 'peca_mednmet', 'peca_medmet', 'peca_grdnmet', 'peca_grdmet']
             for key3 in pecas:
@@ -509,29 +450,6 @@ class aUI:
 
             self.table = new_table
             self.precondition_dict = new_precondition_dict
-
-        self.UpdateCanvas()
-
-
-
-        '''
-        if self.thread_client is not None:
-            if self.thread_client.is_alive() and self.client_instance.client.connected:
-                self.frame6.tkraise()
-            else:
-                self.frame3.tkraise()
-        else :
-            self.frame3.tkraise()
-        '''
-        #if self.f1:
-        #    self.frame3.tkraise()
-        #else:
-        #    self.frame6.tkraise()
-
-        #self.f1 = not self.f1
-        #print(threading.enumerate(),'\n')
-
-
 
         self.mainwindow.after(50, self.update)
 
@@ -569,7 +487,6 @@ class aUI:
 
     def parar(self):
         self.client_instance.stop1()
-        #self.conectar()
         self.text1.configure(state="normal")
         self.text1.insert(tk.END, "Parando\n")
         self.text1.see(tk.END)
@@ -833,39 +750,6 @@ class aUI:
         # Escrevendo o problema no arquivo
         with open('problem.pddl', 'w') as f:
             f.writelines(lines)
-
-    def UpdateCanvas(self):
-        if self.client_instance is not None:
-            table = self.client_instance.get_table()
-            if table['liga_esteira'] and self.thread_client.is_alive():
-                self.canvas1.itemconfigure(self.belt_id, state=tk.HIDDEN)
-                self.canvas1.itemconfig(self.belt_moving_id, image=self.belt_moving_frames[self.frame_index])
-                self.frame_index = (self.frame_index + 1) % len(self.belt_moving_frames)
-                self.canvas1.itemconfigure(self.belt_moving_id, state=tk.NORMAL)
-            else:
-                self.canvas1.itemconfigure(self.belt_moving_id, state=tk.HIDDEN)
-                self.canvas1.itemconfigure(self.belt_id, state=tk.NORMAL)
-
-            if table['anvanca_ap1']:
-                self.canvas1.itemconfigure(self.expiston1_id, state=tk.NORMAL)
-                self.canvas1.itemconfigure(self.piston1_id, state=tk.HIDDEN)
-            else:
-                self.canvas1.itemconfigure(self.expiston1_id, state=tk.HIDDEN)
-                self.canvas1.itemconfigure(self.piston1_id, state=tk.NORMAL)
-
-            if table['anvanca_ap2']:
-                self.canvas1.itemconfigure(self.expiston2_id, state=tk.NORMAL)
-                self.canvas1.itemconfigure(self.piston2_id, state=tk.HIDDEN)
-            else:
-                self.canvas1.itemconfigure(self.expiston2_id, state=tk.HIDDEN)
-                self.canvas1.itemconfigure(self.piston2_id, state=tk.NORMAL)
-
-            if table['anvanca_ap3']:
-                self.canvas1.itemconfigure(self.expiston3_id, state=tk.NORMAL)
-                self.canvas1.itemconfigure(self.piston3_id, state=tk.HIDDEN)
-            else:
-                self.canvas1.itemconfigure(self.expiston3_id, state=tk.HIDDEN)
-                self.canvas1.itemconfigure(self.piston3_id, state=tk.NORMAL)
 
 
 if __name__ == "__main__":
