@@ -465,7 +465,7 @@ class aUI:
                                 #self.text1.insert(tk.END, s)
                             case 'fc_3':
                                 self.text1.insert(tk.END, "3\n")
-                                #self.caixa_descarte3[peca] = self.caixa_descarte3[peca] + 1
+                                self.caixa_descarte3[peca] = self.caixa_descarte3[peca] + 1
                                 #s = ('peça ' + peca + 'chegou na caixa3')
                                 #self.text1.insert(tk.END, s)
                                 #s = ('quantidade de pecas do tipo ' + peca + ' na caixa 3:' + str(self.caixa_descarte3[peca])+'\n')
