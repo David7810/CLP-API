@@ -69,12 +69,39 @@ import tkinter.ttk as ttk
 class aUI:
     def __init__(self, master=None):
 
+        #self.thread_client = Main_program_ThreadClient()
         self.ip = None
         self.thread_client = None
         self.client_instance = None
         self.end_que = Queue()
         self.pecas_que = Queue()
         self.descartando_pecaincorreta = False
+
+
+        #Armazena informações sobre a existencia de uma peça em movimento
+        '''
+        self.moving_piece = {
+            'peca_peqnmet': False,
+            'peca_peqmet': False,
+            'peca_mednmet': False,
+            'peca_medmet': False,
+            'peca_grdnmet': False,
+            'peca_grdmet': False
+        }'''
+        #Armazena informações sobre o destino da peça em movimento
+        #self.destination = None
+
+        #Armazena informações sobre a existencia de uma peça em movimento
+        self.moving_piece_data = {
+            'type': None,
+            'destination': None,
+            'moving': False,
+            'x_coord': 0,
+            'y_coor': 0,
+            'start': False
+        }
+        self.item_dx = 10
+        self.item_dy = 10
 
         #Armazena a quantidade de peças em cada caixa
         self.caixa_descarte1 = {
@@ -111,7 +138,23 @@ class aUI:
         }
 
         self.precondition_dict = {}
-        self.table = {}
+        self.table = {
+            'liga_esteira': False,
+            'anvanca_ap1': False,
+            'anvanca_ap2': False,
+            'anvanca_ap3': False,
+            'retrai_ap3': False,
+            'fc_1': False,
+            'fc_2': False,
+            'fc_3': False,
+            'fc_4': False,
+            'peca_peqnmet': False,
+            'peca_peqmet': False,
+            'peca_mednmet': False,
+            'peca_medmet': False,
+            'peca_grandnmet': False,
+            'peca_grandmet': False
+        }
 
         # build ui
         tk2 = tk.Tk(master)
@@ -122,7 +165,7 @@ class aUI:
 
         tk2.configure(height=720, width=1280)
         self.frame3 = ttk.Frame(tk2)
-        self.frame3.configure(height=250, width=1280)
+        self.frame3.configure(height=720, width=1280)
         message3 = tk.Message(self.frame3)
         message3.configure(text='Digite o IP do CLP', width=100)
         message3.pack(anchor="center", pady=20, side="top")
@@ -134,10 +177,10 @@ class aUI:
         self.frame3.grid(column=0, row=0)
         self.frame3.pack_propagate(0)
         self.frame6 = ttk.Frame(tk2)
-        self.frame6.configure(height=250, width=1280)
-        #self.canvas1 = tk.Canvas(self.frame6)
-        #self.canvas1.configure(height=450, state="normal", width=1152)
-        #self.canvas1.pack(padx=20, pady=20, side="top")
+        self.frame6.configure(height=720, width=1280)
+        self.canvas1 = tk.Canvas(self.frame6)
+        self.canvas1.configure(height=450, state="normal", width=1152)
+        self.canvas1.pack(padx=20, pady=20, side="top")
         frame5 = ttk.Frame(self.frame6)
         frame5.configure(height=200, width=200)
         labelframe2 = ttk.Labelframe(frame5)
@@ -229,8 +272,8 @@ class aUI:
         labelframe2.grid(column=0, row=0)
         labelframe4 = ttk.Labelframe(frame5)
         labelframe4.configure(height=200, text='Execução', width=200)
-        label10 = ttk.Label(labelframe4)
-        label10.configure(text='Estado:  ')
+        #label10 = ttk.Label(labelframe4)
+        #label10.configure(text='Estado:  ')
         #label10.pack(expand=True, side="top")
         self.button2 = ttk.Button(labelframe4)
         self.button2.configure(text='Iniciar', command=self.iniciar)
@@ -256,7 +299,66 @@ class aUI:
         self.frame6.grid(column=0, row=0)
         self.frame6.pack_propagate(0)
 
-        #Carrega a ilustracao
+        #Carrega as imagens GIF
+        self.expiston = tk.PhotoImage(file='./assets/expiston.gif')
+        self.piston = tk.PhotoImage(file='./assets/piston.gif')
+        self.grdmet = tk.PhotoImage(file='./assets/grdmet.gif')
+        self.medmet = tk.PhotoImage(file='./assets/medmet.gif')
+        self.peqmet = tk.PhotoImage(file='./assets/peqmet.gif')
+        self.grdnmet = tk.PhotoImage(file='./assets/grdnmet.gif')
+        self.mednmet = tk.PhotoImage(file='./assets/mednmet.gif')
+        self.peqnmet = tk.PhotoImage(file='./assets/peqnmet.gif')
+        self.belt = tk.PhotoImage(file='./assets/belt.gif')
+        self.belt_moving_frames = self.load_gif_frames('./assets/belt_moving.gif')
+
+        #Criando imagens no canvas
+        self.peqmet_moving_image = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.peqmet)
+        self.peqnmet_moving_image = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.peqnmet)
+        self.medmet_moving_image = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.medmet)
+        self.mednmet_moving_image = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.mednmet)
+        self.grdmet_moving_image = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.grdmet)
+        self.grdnmet_moving_image = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.grdnmet)
+
+        self.piston1_id = self.canvas1.create_image(345, 15, anchor=tk.NW, image=self.piston)
+        self.piston2_id = self.canvas1.create_image(575, 15, anchor=tk.NW, image=self.piston)
+        self.piston3_id = self.canvas1.create_image(785, 15, anchor=tk.NW, image=self.piston)
+        self.expiston1_id = self.canvas1.create_image(345, 15, anchor=tk.NW, image=self.expiston)
+        self.expiston2_id = self.canvas1.create_image(575, 15, anchor=tk.NW, image=self.expiston)
+        self.expiston3_id = self.canvas1.create_image(785, 15, anchor=tk.NW, image=self.expiston)
+
+
+        #Configurando imagens
+        self.belt_id = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.belt)
+        self.belt_moving_id = self.canvas1.create_image(0, 0, anchor=tk.NW, image=self.belt_moving_frames[0])
+        self.frame_index = 0
+        self.canvas1.tag_raise(self.piston1_id)
+        self.canvas1.tag_raise(self.piston2_id)
+        self.canvas1.tag_raise(self.piston3_id)
+        self.canvas1.tag_raise(self.expiston1_id)
+        self.canvas1.tag_raise(self.expiston2_id)
+        self.canvas1.tag_raise(self.expiston3_id)
+        self.canvas1.itemconfigure(self.expiston1_id, state=tk.HIDDEN)
+        self.canvas1.itemconfigure(self.expiston2_id, state=tk.HIDDEN)
+        self.canvas1.itemconfigure(self.expiston3_id, state=tk.HIDDEN)
+
+        self.canvas1.itemconfigure(self.peqmet_moving_image, state=tk.HIDDEN)
+        self.canvas1.tag_raise(self.peqmet_moving_image)
+
+        self.canvas1.itemconfigure(self.peqnmet_moving_image, state=tk.HIDDEN)
+        self.canvas1.tag_raise(self.peqnmet_moving_image)
+
+        self.canvas1.itemconfigure(self.medmet_moving_image, state=tk.HIDDEN)
+        self.canvas1.tag_raise(self.medmet_moving_image)
+
+        self.canvas1.itemconfigure(self.mednmet_moving_image, state=tk.HIDDEN)
+        self.canvas1.tag_raise(self.mednmet_moving_image)
+
+        self.canvas1.itemconfigure(self.grdnmet_moving_image, state=tk.HIDDEN)
+        self.canvas1.tag_raise(self.grdnmet_moving_image)
+
+        self.canvas1.itemconfigure(self.grdmet_moving_image, state=tk.HIDDEN)
+        self.canvas1.tag_raise(self.grdmet_moving_image)
+
 
 
         self.frame3.tkraise()
@@ -280,7 +382,18 @@ class aUI:
         close_button = tk.Button(window, text="Fechar", command=window.destroy)
         close_button.pack(pady=10)
 
-
+    def load_gif_frames(self, file_path):
+        frames = []
+        image = tk.PhotoImage(file=file_path)
+        try:
+            i = 0
+            while True:
+                frames.append(image.subsample(1, 1).copy())
+                i += 1
+                image = tk.PhotoImage(file=file_path, format=f"gif -index {i}")
+        except:
+            pass
+        return frames
 
 
 
@@ -375,6 +488,8 @@ class aUI:
                 #Identifica nova peça detectada
                 if key in self.table and key in new_table:
                     if self.table[key] is False and new_table[key] is True:
+                        if not self.pecas_que.empty():
+                            self.pecas_que.get()
                         self.pecas_que.put(key)
                         self.text1.configure(state="normal")
                         match key:
@@ -399,12 +514,18 @@ class aUI:
                 if key in self.table and key in new_table:
                     if self.table[key] is False and new_table[key] is True and not self.pecas_que.empty():
                         self.text1.configure(state="normal")
+
+                        # Informação sobre recebimento de peça
                         self.text1.insert(tk.END, "Peça recebida na caixa ")
                         peca = self.pecas_que.get()
                         match key:
                             case 'fc_1':
                                 self.text1.insert(tk.END, "1\n")
                                 self.caixa_descarte1[peca] = self.caixa_descarte1[peca] + 1
+                                self.moving_piece_data['type'] = peca
+                                self.moving_piece_data['moving'] = True
+                                self.moving_piece_data['start'] = True
+                                self.moving_piece_data['destination'] = 'fc_1'
                                 #s =('peça '+ peca + 'chegou na caixa1\n')
                                 #self.text1.insert(tk.END, s)
                                 #s = ('quantidade de pecas do tipo ' + peca + ' na caixa 1:' + str(self.caixa_descarte1[peca])+'\n')
@@ -412,12 +533,21 @@ class aUI:
                             case 'fc_2':
                                 self.text1.insert(tk.END, "2\n")
                                 self.caixa_descarte2[peca] = self.caixa_descarte2[peca] + 1
+                                self.moving_piece_data['type'] = peca
+                                self.moving_piece_data['moving'] = True
+                                self.moving_piece_data['start'] = True
+                                self.moving_piece_data['destination'] = 'fc_2'
                                 #s =('peça ' + peca + 'chegou na caixa2')
                                 #self.text1.insert(tk.END, s)
                                 #s = ('quantidade de pecas do tipo ' + peca + ' na caixa 2:' + str(self.caixa_descarte2[peca])+'\n')
                                 #self.text1.insert(tk.END, s)
                             case 'fc_3':
                                 self.text1.insert(tk.END, "3\n")
+                                self.caixa_descarte3[peca] = self.caixa_descarte3[peca] + 1
+                                self.moving_piece_data['type'] = peca
+                                self.moving_piece_data['moving'] = True
+                                self.moving_piece_data['start'] = True
+                                self.moving_piece_data['destination'] = 'fc_3'
                                 self.caixa_descarte3[peca] = self.caixa_descarte3[peca] + 1
                                 #s = ('peça ' + peca + 'chegou na caixa3')
                                 #self.text1.insert(tk.END, s)
@@ -426,6 +556,10 @@ class aUI:
                             case 'fc_4':
                                 self.text1.insert(tk.END, "4\n")
                                 self.caixa_descarte4[peca] = self.caixa_descarte4[peca] + 1
+                                self.moving_piece_data['type'] = peca
+                                self.moving_piece_data['moving'] = True
+                                self.moving_piece_data['start'] = True
+                                self.moving_piece_data['destination'] = 'fc_4'
                                 #s = ('peça ' + peca + 'chegou na caixa4')
                                 #self.text1.insert(tk.END, s)
                                 #s = ('quantidade de pecas do tipo ' + peca + ' na caixa 4:' + str(self.caixa_descarte4[peca])+'\n')
@@ -434,7 +568,20 @@ class aUI:
                         self.text1.see(tk.END)
                         self.text1.configure(state="disabled")
 
-
+            '''
+            #Detecta peça incorreta inserida
+            if not self.pecas_que.empty():
+                if self.pecas_que.queue[0] in self.table and not self.descartando_pecaincorreta:
+                    #if self.table[self.pecas_que.queue[0]] is True:
+                    pecas = ['peca_peqnmet', 'peca_peqmet', 'peca_mednmet', 'peca_medmet', 'peca_grdnmet', 'peca_grdmet']
+                    pecas_err = [item for item in pecas if item != self.pecas_que.queue[0]]
+                    for key3 in pecas_err:
+                        if self.table[key3] is True:
+                            self.text1.configure(state="normal")
+                            self.text1.insert(tk.END, "Peça incorreta. Descartando.\n")
+                            self.text1.configure(state="disabled")
+                            self.descartando_pecaincorreta = True
+            '''
             # Detecta peça incorreta inserida
             pecas = ['peca_peqnmet', 'peca_peqmet', 'peca_mednmet', 'peca_medmet', 'peca_grdnmet', 'peca_grdmet']
             for key3 in pecas:
@@ -450,6 +597,29 @@ class aUI:
 
             self.table = new_table
             self.precondition_dict = new_precondition_dict
+
+        self.UpdateCanvas()
+
+
+
+        '''
+        if self.thread_client is not None:
+            if self.thread_client.is_alive() and self.client_instance.client.connected:
+                self.frame6.tkraise()
+            else:
+                self.frame3.tkraise()
+        else :
+            self.frame3.tkraise()
+        '''
+        #if self.f1:
+        #    self.frame3.tkraise()
+        #else:
+        #    self.frame6.tkraise()
+
+        #self.f1 = not self.f1
+        #print(threading.enumerate(),'\n')
+
+
 
         self.mainwindow.after(50, self.update)
 
@@ -487,6 +657,7 @@ class aUI:
 
     def parar(self):
         self.client_instance.stop1()
+        #self.conectar()
         self.text1.configure(state="normal")
         self.text1.insert(tk.END, "Parando\n")
         self.text1.see(tk.END)
@@ -750,6 +921,212 @@ class aUI:
         # Escrevendo o problema no arquivo
         with open('problem.pddl', 'w') as f:
             f.writelines(lines)
+
+
+    def update_img_pos(self, piece_type, destination):
+        match destination:
+            case 'fc_1':
+                x_stopping = 340
+                y_stopping = 350
+            case 'fc_2':
+                x_stopping = 570
+                y_stopping = 350
+            case 'fc_3':
+                x_stopping = 800
+                y_stopping = 350
+            case 'fc_4':
+                x_stopping = 900
+                y_stopping = 0
+
+        match piece_type:
+            case 'peca_peqnmet':
+                if self.canvas1.coords(self.peqnmet_moving_image)[0] < x_stopping:
+                    self.canvas1.move(self.peqnmet_moving_image, self.item_dx, 0)
+
+                else:
+                    if self.canvas1.coords(self.peqnmet_moving_image)[1] < y_stopping:
+                        self.canvas1.move(self.peqnmet_moving_image, 0, self.item_dy)
+                    else:
+                        self.moving_piece_data['moving'] = False
+                        self.canvas1.itemconfigure(self.peqnmet_moving_image, state=tk.HIDDEN)
+
+            case 'peca_peqmet':
+                if self.canvas1.coords(self.peqmet_moving_image)[0] < x_stopping:
+                    self.canvas1.move(self.peqmet_moving_image, self.item_dx, 0)
+
+                else:
+                    if self.canvas1.coords(self.peqmet_moving_image)[1] < y_stopping:
+                        self.canvas1.move(self.peqmet_moving_image, 0, self.item_dy)
+                    else:
+                        self.moving_piece_data['moving'] = False
+                        self.canvas1.itemconfigure(self.peqmet_moving_image, state=tk.HIDDEN)
+
+            case 'peca_mednmet':
+                if self.canvas1.coords(self.mednmet_moving_image)[0] < x_stopping:
+                    self.canvas1.move(self.mednmet_moving_image, self.item_dx, 0)
+
+                else:
+                    if self.canvas1.coords(self.mednmet_moving_image)[1] < y_stopping:
+                        self.canvas1.move(self.mednmet_moving_image, 0, self.item_dy)
+                    else:
+                        self.moving_piece_data['moving'] = False
+                        self.canvas1.itemconfigure(self.mednmet_moving_image, state=tk.HIDDEN)
+
+            case 'peca_medmet':
+                if self.canvas1.coords(self.medmet_moving_image)[0] < x_stopping:
+                    self.canvas1.move(self.medmet_moving_image, self.item_dx, 0)
+
+                else:
+                    if self.canvas1.coords(self.medmet_moving_image)[1] < y_stopping:
+                        self.canvas1.move(self.medmet_moving_image, 0, self.item_dy)
+                    else:
+                        self.moving_piece_data['moving'] = False
+                        self.canvas1.itemconfigure(self.medmet_moving_image, state=tk.HIDDEN)
+
+            case 'peca_grdmet':
+                if self.canvas1.coords(self.grdmet_moving_image)[0] < x_stopping:
+                    self.canvas1.move(self.grdmet_moving_image, self.item_dx, 0)
+
+                else:
+                    if self.canvas1.coords(self.grdmet_moving_image)[1] < y_stopping:
+                        self.canvas1.move(self.grdmet_moving_image, 0, self.item_dy)
+                    else:
+                        self.moving_piece_data['moving'] = False
+                        self.canvas1.itemconfigure(self.grdmet_moving_image, state=tk.HIDDEN)
+
+            case 'peca_grdnmet':
+                if self.canvas1.coords(self.grdnmet_moving_image)[0] < x_stopping:
+                    self.canvas1.move(self.grdnmet_moving_image, self.item_dx, 0)
+
+                else:
+                    if self.canvas1.coords(self.grdnmet_moving_image)[1] < y_stopping:
+                        self.canvas1.move(self.grdnmet_moving_image, 0, self.item_dy)
+                    else:
+                        self.moving_piece_data['moving'] = False
+                        self.canvas1.itemconfigure(self.grdnmet_moving_image, state=tk.HIDDEN)
+
+    def UpdateCanvas(self):
+
+        #Atualizando o desenho da esteira e atuadores
+        table = self.table
+        if table['liga_esteira'] or self.moving_piece_data['moving']:
+            self.canvas1.itemconfigure(self.belt_id, state=tk.HIDDEN)
+            self.canvas1.itemconfig(self.belt_moving_id, image=self.belt_moving_frames[self.frame_index])
+            self.frame_index = (self.frame_index + 1) % len(self.belt_moving_frames)
+            self.canvas1.itemconfigure(self.belt_moving_id, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.belt_moving_id, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.belt_id, state=tk.NORMAL)
+
+        if table['anvanca_ap1']:
+            self.canvas1.itemconfigure(self.expiston1_id, state=tk.NORMAL)
+            self.canvas1.itemconfigure(self.piston1_id, state=tk.HIDDEN)
+        else:
+            self.canvas1.itemconfigure(self.expiston1_id, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.piston1_id, state=tk.NORMAL)
+
+        if table['anvanca_ap2']:
+            self.canvas1.itemconfigure(self.expiston2_id, state=tk.NORMAL)
+            self.canvas1.itemconfigure(self.piston2_id, state=tk.HIDDEN)
+        else:
+            self.canvas1.itemconfigure(self.expiston2_id, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.piston2_id, state=tk.NORMAL)
+
+        if table['anvanca_ap3']:
+            self.canvas1.itemconfigure(self.expiston3_id, state=tk.NORMAL)
+            self.canvas1.itemconfigure(self.piston3_id, state=tk.HIDDEN)
+        else:
+            self.canvas1.itemconfigure(self.expiston3_id, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.piston3_id, state=tk.NORMAL)
+
+
+
+        #Atualizando posição da peça em movimento
+        if self.moving_piece_data['moving'] and self.moving_piece_data['destination'] is not None:
+
+            if self.moving_piece_data['start'] is True:
+                self.moving_piece_data['start'] = False
+
+                Starting_piece_coord = [100, 200]
+                match self.moving_piece_data['type']:
+                    case 'peca_peqnmet':
+                        self.canvas1.itemconfigure(self.peqnmet_moving_image, state=tk.NORMAL)
+                        self.canvas1.coords(self.peqnmet_moving_image, *Starting_piece_coord)
+                    case 'peca_peqmet':
+                        self.canvas1.itemconfigure(self.peqmet_moving_image, state=tk.NORMAL)
+                        self.canvas1.coords(self.peqmet_moving_image, *Starting_piece_coord)
+                    case 'peca_medmet':
+                        self.canvas1.itemconfigure(self.medmet_moving_image, state=tk.NORMAL)
+                        self.canvas1.coords(self.medmet_moving_image, *Starting_piece_coord)
+                    case 'peca_mednmet':
+                        self.canvas1.itemconfigure(self.mednmet_moving_image, state=tk.NORMAL)
+                        self.canvas1.coords(self.mednmet_moving_image, *Starting_piece_coord)
+                    case 'peca_grdnmet':
+                        self.canvas1.itemconfigure(self.grdnmet_moving_image, state=tk.NORMAL)
+                        self.canvas1.coords(self.grdnmet_moving_image, *Starting_piece_coord)
+                    case 'peca_grdmet':
+                        self.canvas1.itemconfigure(self.grdmet_moving_image, state=tk.NORMAL)
+                        self.canvas1.coords(self.grdmet_moving_image, *Starting_piece_coord)
+
+
+            self.update_img_pos(self.moving_piece_data['type'], self.moving_piece_data['destination'])
+            '''
+            match self.moving_piece_data['destination']:
+                
+                case 'fc_1':
+                    match self.moving_piece_data['type']:
+                        case 'peca_peqnmet':
+                            if self.canvas1.coords(self.peqnmet_moving_image)[0] < 340:
+                                self.canvas1.move(self.peqnmet_moving_image, self.item_dx, 0)
+
+                            else:
+                                if self.canvas1.coords(self.peqnmet_moving_image)[1] < 350:
+                                    self.canvas1.move(self.peqnmet_moving_image, 0, self.item_dy)
+                                else:
+                                    self.moving_piece_data['moving'] = False
+                                    self.canvas1.itemconfigure(self.peqnmet_moving_image, state=tk.HIDDEN)
+
+                            
+
+
+
+                case 'fc_2':
+                    if self.canvas1.coords(self.moving_img)[0] < 450:
+                        self.canvas1.move(self.moving_img, self.item_dx, 0)
+
+                    else:
+                        if self.canvas1.coords(self.moving_img)[1] < 600:
+                            self.canvas1.move(self.moving_img, 0, self.item_dy)
+                        else:
+                            self.moving_piece_data['moving'] = False
+                            #self.canvas1.itemconfigure(self.moving_img, state=tk.HIDDEN)
+
+                case 'fc_3':
+                    if self.canvas1.coords(self.moving_img)[0] < 450:
+                        self.canvas1.move(self.moving_img, self.item_dx, 0)
+
+                    else:
+                        if self.canvas1.coords(self.moving_img)[1] < 600:
+                            self.canvas1.move(self.moving_img, 0, self.item_dy)
+                        else:
+                            self.moving_piece_data['moving'] = False
+                            Starting_piece_coord = [40, 150]
+                            #self.canvas1.coords(self.moving_img, *Starting_piece_coord)
+                            #self.canvas1.itemconfigure(self.moving_img, state=tk.HIDDEN)
+
+                case 'fc_4':
+                    if self.canvas1.coords(self.moving_img)[0] < 450:
+                        self.canvas1.move(self.moving_img, self.item_dx, 0)
+
+                    else:
+                        if self.canvas1.coords(self.moving_img)[1] < 600:
+                            self.canvas1.move(self.moving_img, 0, self.item_dy)
+                        else:
+                            self.moving_piece_data['moving'] = False
+                            Starting_piece_coord = [40, 150]
+                            #self.canvas1.coords(self.moving_img, *Starting_piece_coord)
+                            #self.canvas1.itemconfigure(self.moving_img, state=tk.HIDDEN)
+                '''
 
 
 if __name__ == "__main__":
