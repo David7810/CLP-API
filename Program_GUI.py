@@ -726,32 +726,32 @@ class aUI:
                     num = 0
                     tipo_items = {}
                     for x in range(n_peq_metal):
-                        line = line + 'item' + str(num) + ' - peqmet\n        '
+                        line = line + 'item' + str(num) + ' - objeto\n        '
                         tipo_items['item' + str(num)] = 'peqmet'
                         num += 1
 
                     for x in range(n_med_metal):
-                        line = line + 'item' + str(num) + ' - medmet\n        '
+                        line = line + 'item' + str(num) + ' - objeto\n        '
                         tipo_items['item' + str(num)] = 'medmet'
                         num += 1
 
                     for x in range(n_grd_metal):
-                        line = line + 'item' + str(num) + ' - grdmet\n        '
+                        line = line + 'item' + str(num) + ' - objeto\n        '
                         tipo_items['item' + str(num)] = 'grdmet'
                         num += 1
 
                     for x in range(n_peq):
-                        line = line + 'item' + str(num) + ' - peqnmet\n        '
+                        line = line + 'item' + str(num) + ' - objeto\n        '
                         tipo_items['item' + str(num)] = 'peqnmet'
                         num += 1
 
                     for x in range(n_med):
-                        line = line + 'item' + str(num) + ' - mednmet\n        '
+                        line = line + 'item' + str(num) + ' - objeto\n        '
                         tipo_items['item' + str(num)] = 'mednmet'
                         num += 1
 
                     for x in range(n_grd):
-                        line = line + 'item' + str(num) + ' - grdnmet\n        '
+                        line = line + 'item' + str(num) + ' - objeto\n        '
                         tipo_items['item' + str(num)] = 'grdnmet'
                         num += 1
 
