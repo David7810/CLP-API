@@ -2,12 +2,9 @@
 (:domain sorting)
     
     (:objects
-        atuador_simples1 - atuador_simples1
-        atuador_simples2 - atuador_simples2
-        atuador_duplo1 - atuador_duplo1
-        box1 - box1
-        box2 - box2
-        box3 - box3
+        atuador_simples1 atuador_simples2 atuador_duplo1 - atuador
+        box1 box2 box3 - destino
+
         esteira - esteira
         inicio - inicio
         peqnmet1 peqmet1 mednmet1 medmet1 grdnmet1 grdmet1 - caracteristica
@@ -17,6 +14,10 @@
     )
     
     (:init
+	(link atuador_simples1 box1)
+        (link atuador_simples2 box2)
+        (link atuador_duplo1 box3)
+
 	##definir_tipos
 
 	##definir_inicio
