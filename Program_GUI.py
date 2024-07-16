@@ -288,7 +288,7 @@ class aUI:
         self.button2.configure(text='Iniciar', command=self.iniciar)
         self.button2.pack(expand=True, side="top")
         self.button3 = ttk.Button(labelframe4)
-        self.button3.configure(text='Parar/Reprogamar', command=self.parar)
+        self.button3.configure(text='Reprogamar', command=self.parar)
         self.button3.pack(expand=True, side="top")
         button4 = ttk.Button(labelframe4)
         button4.configure(text='Voltar', command=self.desconectar)
