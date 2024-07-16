@@ -13,6 +13,11 @@ class Mainloop():
 
     def __init__(self, ip):
 
+        #Endereço Solver.Planning.Domains
+        self.enderco_solver = 'https://solver.planning.domains:5001'
+        self.package = '/package/lama-first/solve'
+
+
         #Instancia o cliente Modbus.
         self.client = modbus.ModbusTcpClient(ip)
 
@@ -65,12 +70,19 @@ class Mainloop():
         self.running = False
         self.stop = False
         self.precondition_dict = {}
+        self.effect_dict = {}
 
-    def setprecondition_dict(self, dict):
-        self.precondition_dict = dict
+    def setprecondition_dict(self, dicti):
+        self.precondition_dict = dicti
 
     def getprecondition_dict(self):
         return self.precondition_dict
+
+    def seteffect_dict(self, dicti):
+        self.effect_dict = dicti
+
+    def geteffect_dict(self):
+        return self.effect_dict
 
     def get_table(self):
         return self.table
@@ -88,6 +100,7 @@ class Mainloop():
     def stop1(self):
         self.stop = True
 
+
     def getstate(self):
         return self.running
 
@@ -99,19 +112,12 @@ class Mainloop():
         modbus.write_coil_call(self.client, self.coil_addr['retrai_ap3'], False)
 
     def run(self):
-
         #Cria o cliente modbus com o ip fornecido.
         #print(self.client.connected)
         self.client.connect()
         self.reset()
 
         #print(self.client.connected)
-
-
-
-
-
-
 
         F1 = False
 
@@ -126,18 +132,17 @@ class Mainloop():
 
         # Send job request to solve endpoint.
         try:
-            solve_request_url=requests.post("https://solver.planning.domains:5001/package/lama-first/solve", json=req_body).json()
+            solve_request_url=requests.post(self.enderco_solver+self.package, json=req_body).json()
         except Exception as err:
             print('Erro ao obter a solução. Verifique a conexão com a internet')
             raise err
 
         # Query the result in the job.
-        celery_result=requests.post('https://solver.planning.domains:5001' + solve_request_url['result'], json={"adaptor":"planning_editor_adaptor"}  )
+        celery_result=requests.post(self.enderco_solver + solve_request_url['result'], json={"adaptor":"planning_editor_adaptor"}  )
         print('Computing...')
         while celery_result.json().get("status","")== 'PENDING':
-
             # Query the result every 0.5 seconds while the job is executing
-            celery_result=requests.post('https://solver.planning.domains:5001' + solve_request_url['result'])
+            celery_result=requests.post(self.enderco_solver + solve_request_url['result'])
             time.sleep(0.5)
             print('pending')
 
@@ -396,6 +401,7 @@ class Mainloop():
                 print('Effect Met?  ')
                 print(functions.compare_dicts(effect_dict, self.get_table()))
                 effect_met = functions.compare_dicts(effect_dict, self.get_table())
+                self.seteffect_dict(effect_dict)
 
                 print('\nCondition we have:')
                 print(self.get_table())
@@ -408,6 +414,7 @@ class Mainloop():
 
 
 if __name__ == "__main__":
+
     app = Mainloop('127.1.1.1')
     app.running = True
     #app.running = True
