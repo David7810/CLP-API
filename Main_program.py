@@ -7,6 +7,7 @@ import requests
 import modbus
 import re
 import time
+import functions
 
 class Mainloop():
 
@@ -110,11 +111,7 @@ class Mainloop():
         modbus.write_coil_call(self.client, self.coil_addr['anvanca_ap3'], False)
         modbus.write_coil_call(self.client, self.coil_addr['retrai_ap3'], False)
 
-    def compare_dicts(dict1, dict2):
-        for key in dict1.keys():
-            if key not in dict2.keys() or dict1[key] != dict2[key]:
-                return False
-        return True
+
 
     def run(self):
         #Cria o cliente modbus com o ip fornecido.
@@ -345,8 +342,8 @@ class Mainloop():
                 self.set_table(current_table)
 
                 print('precondition Met?  ')
-                print(self.compare_dicts(precondition_dict, self.get_table()))
-                precondition_met = self.compare_dicts(precondition_dict, self.get_table())
+                print(functions.compare_dicts(precondition_dict, self.get_table()))
+                precondition_met = functions.compare_dicts(precondition_dict, self.get_table())
 
                 print('\nCondition we have:')
                 print(self.get_table())
@@ -404,8 +401,8 @@ class Mainloop():
                 self.set_table(current_table)
 
                 print('Effect Met?  ')
-                print(self.compare_dicts(effect_dict, self.get_table()))
-                effect_met = self.compare_dicts(effect_dict, self.get_table())
+                print(functions.compare_dicts(effect_dict, self.get_table()))
+                effect_met = functions.compare_dicts(effect_dict, self.get_table())
                 self.seteffect_dict(effect_dict)
 
                 print('\nCondition we have:')
