@@ -17,32 +17,27 @@ class Mainloop():
         self.enderco_solver = 'https://solver.planning.domains:5001'
         self.package = '/package/lama-first/solve'
 
-
         #Instancia o cliente Modbus.
         self.client = modbus.ModbusTcpClient(ip)
 
-        self.finalizado = False
 
         #Dicionario contendo o estado das entradas e saidas digitais do CLP.
-        #Inicialmente todas os registros sao inicializados como falso.
-        #Quando em execucao as variaveis associadas as entradas digitais do CLP serao atualizados
-        #conforme o estado da memoria
         self.table = {
-            'liga_esteira': False,   #OUT
-            'anvanca_ap1': False,    #IN
-            'anvanca_ap2': False,    #IN
-            'anvanca_ap3': False,    #IN
-            'retrai_ap3': False,     #IN Logica interna
-            'fc_1': False,           #OUT
-            'fc_2': False,           #OUT
-            'fc_3': False,           #OUT
-            'fc_4': False,          #OUT
-            'peca_peqnmet': False,   #OUT
-            'peca_peqmet': False,    #OUT
-            'peca_mednmet': False,   #OUT
-            'peca_medmet': False,    #OUT
-            'peca_grandnmet': False, #OUT
-            'peca_grandmet': False   #OUT
+            'liga_esteira': False,
+            'anvanca_ap1': False,
+            'anvanca_ap2': False,
+            'anvanca_ap3': False,
+            'retrai_ap3': False,
+            'fc_1': False,
+            'fc_2': False,
+            'fc_3': False,
+            'fc_4': False,
+            'peca_peqnmet': False,
+            'peca_peqmet': False,
+            'peca_mednmet': False,
+            'peca_medmet': False,
+            'peca_grandnmet': False,
+            'peca_grandmet': False
         }
 
         # Enderco das entradas e saidas
@@ -65,10 +60,11 @@ class Mainloop():
         }
 
         #Flags de status de funcionamento
-        self.start = False
-        self.state = True
         self.running = False
         self.stop = False
+        self.state = True
+        self.finalizado = False
+
         self.precondition_dict = {}
         self.effect_dict = {}
 
@@ -316,7 +312,6 @@ class Mainloop():
             #Quando as precondicoes sao atingidas prosseguimos
             while not precondition_met:
                 if self.stop:
-                #if not self.running:
                     self.reset()
                     return 0
 
@@ -419,5 +414,4 @@ if __name__ == "__main__":
 
     app = Mainloop('127.1.1.1')
     app.running = True
-    #app.running = True
     app.run()

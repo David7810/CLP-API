@@ -76,8 +76,6 @@ import tkinter.ttk as ttk
 
 class aUI:
     def __init__(self, master=None):
-
-        #self.thread_client = Main_program_ThreadClient()
         self.ip = None
         self.thread_client = None
         self.client_instance = None
@@ -85,20 +83,6 @@ class aUI:
         self.pecas_que = Queue()
         self.descartando_pecaincorreta = False
         self.proximapeca = None
-
-
-        #Armazena informações sobre a existencia de uma peça em movimento
-        '''
-        self.moving_piece = {
-            'peca_peqnmet': False,
-            'peca_peqmet': False,
-            'peca_mednmet': False,
-            'peca_medmet': False,
-            'peca_grdnmet': False,
-            'peca_grdmet': False
-        }'''
-        #Armazena informações sobre o destino da peça em movimento
-        #self.destination = None
 
         #Armazena informações sobre a existencia de uma peça em movimento
         self.moving_piece_data = {
@@ -288,8 +272,11 @@ class aUI:
         self.button2.configure(text='Iniciar', command=self.iniciar)
         self.button2.pack(expand=True, side="top")
         self.button3 = ttk.Button(labelframe4)
-        self.button3.configure(text='Reprogamar', command=self.parar)
+        self.button3.configure(text='Reprogamar', command=self.reprogramar)
         self.button3.pack(expand=True, side="top")
+        self.button5 = ttk.Button(labelframe4)
+        self.button5.configure(text='Parar', command=self.parar)
+        self.button5.pack(expand=True, side="top")
         button4 = ttk.Button(labelframe4)
         button4.configure(text='Voltar', command=self.desconectar)
         button4.pack(expand=True, side="top")
@@ -368,6 +355,60 @@ class aUI:
         self.canvas1.itemconfigure(self.grdmet_moving_image, state=tk.HIDDEN)
         self.canvas1.tag_raise(self.grdmet_moving_image)
 
+        #definindo imagens de exibição da quantidade de peças em cada caixa
+        self.cx1pm = self.canvas1.create_oval(320, 350, 355, 385, fill='black', state='hidden')
+        self.cx1pm_t = self.canvas1.create_text(338, 368, text=str('P\n0'),fill="white", state='hidden')
+        self.cx1mm = self.canvas1.create_oval(355, 350, 390, 385, fill='black', state='hidden')
+        self.cx1mm_t = self.canvas1.create_text(373, 368, text=str('M\n0'), fill="white", state='hidden')
+        self.cx1gm = self.canvas1.create_oval(390, 350, 425, 385, fill='black', state='hidden')
+        self.cx1gm_t = self.canvas1.create_text(408, 368, text=str('G\n0'), fill="white", state='hidden')
+        self.cx1p = self.canvas1.create_oval(320, 385, 355, 420, fill='white', state='hidden')
+        self.cx1p_t = self.canvas1.create_text(338, 403, text=str('P\n0'), fill="black", state='hidden')
+        self.cx1m = self.canvas1.create_oval(355, 385, 390, 420, fill='white', state='hidden')
+        self.cx1m_t = self.canvas1.create_text(373, 403, text=str('M\n0'), fill="black", state='hidden')
+        self.cx1g = self.canvas1.create_oval(390, 385, 425, 420, fill='white', state='hidden')
+        self.cx1g_t = self.canvas1.create_text(408, 403, text=str('G\n0'), fill="black", state='hidden')
+
+        self.cx2pm = self.canvas1.create_oval(550, 350, 585, 385, fill='black', state='hidden')
+        self.cx2pm_t = self.canvas1.create_text(568, 368, text=str('P\n0'), fill="white", state='hidden')
+        self.cx2mm = self.canvas1.create_oval(585, 350, 620, 385, fill='black', state='hidden')
+        self.cx2mm_t = self.canvas1.create_text(603, 368, text=str('M\n0'), fill="white", state='hidden')
+        self.cx2gm = self.canvas1.create_oval(620, 350, 655, 385, fill='black', state='hidden')
+        self.cx2gm_t = self.canvas1.create_text(638, 368, text=str('G\n0'), fill="white", state='hidden')
+        self.cx2p = self.canvas1.create_oval(550, 385, 585, 420, fill='white', state='hidden')
+        self.cx2p_t = self.canvas1.create_text(568, 403, text=str('P\n0'), fill="black", state='hidden')
+        self.cx2m = self.canvas1.create_oval(585, 385, 620, 420, fill='white', state='hidden')
+        self.cx2m_t = self.canvas1.create_text(603, 403, text=str('M\n0'), fill="black", state='hidden')
+        self.cx2g = self.canvas1.create_oval(620, 385, 655, 420, fill='white', state='hidden')
+        self.cx2g_t = self.canvas1.create_text(638, 403, text=str('G\n0'), fill="black", state='hidden')
+
+        self.cx3pm = self.canvas1.create_oval(760, 350, 795, 385, fill='black', state='hidden')
+        self.cx3pm_t = self.canvas1.create_text(778, 368, text=str('P\n0'), fill="white", state='hidden')
+        self.cx3mm = self.canvas1.create_oval(795, 350, 830, 385, fill='black', state='hidden')
+        self.cx3mm_t = self.canvas1.create_text(813, 368, text=str('M\n0'), fill="white", state='hidden')
+        self.cx3gm = self.canvas1.create_oval(830, 350, 865, 385, fill='black', state='hidden')
+        self.cx3gm_t = self.canvas1.create_text(848, 368, text=str('G\n0'), fill="white", state='hidden')
+        self.cx3p = self.canvas1.create_oval(760, 385, 795, 420, fill='white', state='hidden')
+        self.cx3p_t = self.canvas1.create_text(778, 403, text=str('P\n0'), fill="black", state='hidden')
+        self.cx3m = self.canvas1.create_oval(795, 385, 830, 420, fill='white', state='hidden')
+        self.cx3m_t = self.canvas1.create_text(813, 403, text=str('M\n0'), fill="black", state='hidden')
+        self.cx3g = self.canvas1.create_oval(830, 385, 865, 420, fill='white', state='hidden')
+        self.cx3g_t = self.canvas1.create_text(848, 403, text=str('G\n0'), fill="black", state='hidden')
+
+        self.cx4pm = self.canvas1.create_oval(1000, 175, 1035, 210, fill='black', state='hidden')
+        self.cx4pm_t = self.canvas1.create_text(1018, 193, text=str('P\n0'), fill="white", state='hidden')
+        self.cx4mm = self.canvas1.create_oval(1000, 210, 1035, 245, fill='black', state='hidden')
+        self.cx4mm_t = self.canvas1.create_text(1018, 228, text=str('M\n0'), fill="white", state='hidden')
+        self.cx4gm = self.canvas1.create_oval(1000, 245, 1035, 280, fill='black', state='hidden')
+        self.cx4gm_t = self.canvas1.create_text(1018, 263, text=str('G\n0'), fill="white", state='hidden')
+        self.cx4p = self.canvas1.create_oval(1035, 175, 1070, 210, fill='white', state='hidden')
+        self.cx4p_t = self.canvas1.create_text(1053, 193, text=str('P\n0'), fill="black", state='hidden')
+        self.cx4m = self.canvas1.create_oval(1035, 210, 1070, 245, fill='white', state='hidden')
+        self.cx4m_t = self.canvas1.create_text(1053, 228, text=str('M\n0'), fill="black", state='hidden')
+        self.cx4g = self.canvas1.create_oval(1035, 245, 1070, 280, fill='white', state='hidden')
+        self.cx4g_t = self.canvas1.create_text(1053, 263, text=str('G\n0'), fill="black", state='hidden')
+
+
 
 
         self.frame3.tkraise()
@@ -416,7 +457,6 @@ class aUI:
         #if self.client_instance is not None:
         #    print(self.client_instance.finalizado)
 
-
         if not self.end_que.empty():
             if self.end_que.get() == 2:
                 self.text1.configure(state="normal")
@@ -458,6 +498,7 @@ class aUI:
             self.spinbox19.configure(state=tk.DISABLED)
             self.button2.configure(state=tk.DISABLED)
             self.button3.configure(state=tk.NORMAL)
+            self.button5.configure(state=tk.NORMAL)
         else:
             self.spinbox2.configure(state=tk.NORMAL)
             self.spinbox3.configure(state=tk.NORMAL)
@@ -479,6 +520,7 @@ class aUI:
             self.spinbox19.configure(state=tk.NORMAL)
             self.button2.configure(state=tk.NORMAL)
             self.button3.configure(state=tk.DISABLED)
+            self.button5.configure(state=tk.DISABLED)
 
         # Informaçao sobre proxima peça a ser inserida e peça chegando
         if self.client_instance is not None:
@@ -661,7 +703,6 @@ class aUI:
         self.mainwindow.after(50, self.update)
 
 
-
     def conectar(self):
         entered_value = self.entry.get()
         #print('entered value:', entered_value)
@@ -692,8 +733,29 @@ class aUI:
         self.thread_client = threading.Thread(target=lambda q, a: q.put(a.run()), args=(self.end_que, self.client_instance))
         self.thread_client.start()
 
+    def reprogramar(self):
+        self.client_instance.stop1()
+        #self.conectar()
+        self.text1.configure(state="normal")
+        self.text1.insert(tk.END, "Reprogramando\n")
+        self.text1.see(tk.END)
+        self.text1.configure(state="disabled")
+        while not self.pecas_que.empty():
+            self.pecas_que.get()
+
     def parar(self):
         self.client_instance.stop1()
+        # Zerando as demanddas
+        for value in range(18):
+            self.default[value].set(0)
+
+        # Zerando os itens nas caixas:
+        pecas = ['peca_peqnmet', 'peca_peqmet', 'peca_mednmet', 'peca_medmet', 'peca_grdnmet', 'peca_grdmet']
+        for item in pecas:
+            self.caixa_descarte1[item] = 0
+            self.caixa_descarte2[item] = 0
+            self.caixa_descarte3[item] = 0
+            self.caixa_descarte4[item] = 0
         #self.conectar()
         self.text1.configure(state="normal")
         self.text1.insert(tk.END, "Parando\n")
@@ -701,6 +763,8 @@ class aUI:
         self.text1.configure(state="disabled")
         while not self.pecas_que.empty():
             self.pecas_que.get()
+
+
     def desconectar(self):
         if self.client_instance is not None:
             self.client_instance.stop1()
@@ -732,12 +796,10 @@ class aUI:
         }
         for key in items:
             if items[key] < 0:
-                items[key]=0
+                items[key] = 0
 
         # Gerando o problema a partir das informacoes inseridas
         lines = []
-        #for keys in items:
-            #items[keys] = int(items[keys])
 
         n_box1 = items['cx1_peq_metal'] + items['cx1_med_metal'] + items['cx1_grd_metal'] + items['cx1_peq'] + items[
             'cx1_med'] + items['cx1_grd']
@@ -969,7 +1031,7 @@ class aUI:
             case 'fc_3':
                 self.caixa_descarte3[piece_type] = self.caixa_descarte3[piece_type] + 1
             case 'fc_4':
-                self.caixa_descarte2[piece_type] = self.caixa_descarte4[piece_type] + 1
+                self.caixa_descarte4[piece_type] = self.caixa_descarte4[piece_type] + 1
                 self.descartando_pecaincorreta = False
 
 
@@ -1141,63 +1203,204 @@ class aUI:
 
 
             self.update_img_pos(self.moving_piece_data['type'])
-            '''
-            match self.moving_piece_data['destination']:
-                
-                case 'fc_1':
-                    match self.moving_piece_data['type']:
-                        case 'peca_peqnmet':
-                            if self.canvas1.coords(self.peqnmet_moving_image)[0] < 340:
-                                self.canvas1.move(self.peqnmet_moving_image, self.item_dx, 0)
 
-                            else:
-                                if self.canvas1.coords(self.peqnmet_moving_image)[1] < 350:
-                                    self.canvas1.move(self.peqnmet_moving_image, 0, self.item_dy)
-                                else:
-                                    self.moving_piece_data['moving'] = False
-                                    self.canvas1.itemconfigure(self.peqnmet_moving_image, state=tk.HIDDEN)
+        #Atualizando exibição das caixas
+        self.updateboxes()
 
-                            
+    def updateboxes(self):
+        #Caixa de descarte 1
+        if self.caixa_descarte1['peca_peqnmet'] > 0:
+            self.canvas1.itemconfigure(self.cx1p_t, state=tk.NORMAL, text='P\n'+str(self.caixa_descarte1['peca_peqnmet']))
+            self.canvas1.itemconfigure(self.cx1p, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx1p_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx1p, state=tk.HIDDEN)
+
+        if self.caixa_descarte1['peca_mednmet'] > 0:
+            self.canvas1.itemconfigure(self.cx1m_t, state=tk.NORMAL, text='M\n'+str(self.caixa_descarte1['peca_mednmet']))
+            self.canvas1.itemconfigure(self.cx1m, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx1m_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx1m, state=tk.HIDDEN)
+
+        if self.caixa_descarte1['peca_grdnmet'] > 0:
+            self.canvas1.itemconfigure(self.cx1g_t, state=tk.NORMAL, text='G\n'+str(self.caixa_descarte1['peca_grdnmet']))
+            self.canvas1.itemconfigure(self.cx1g, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx1g_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx1g, state=tk.HIDDEN)
+
+        if self.caixa_descarte1['peca_peqmet'] > 0:
+            self.canvas1.itemconfigure(self.cx1pm_t, state=tk.NORMAL,
+                                       text='P\n' + str(self.caixa_descarte1['peca_peqmet']))
+            self.canvas1.itemconfigure(self.cx1pm, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx1pm_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx1pm, state=tk.HIDDEN)
+
+        if self.caixa_descarte1['peca_medmet'] > 0:
+            self.canvas1.itemconfigure(self.cx1mm_t, state=tk.NORMAL,
+                                       text='M\n' + str(self.caixa_descarte1['peca_medmet']))
+            self.canvas1.itemconfigure(self.cx1mm, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx1mm_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx1mm, state=tk.HIDDEN)
+
+        if self.caixa_descarte1['peca_grdmet'] > 0:
+            self.canvas1.itemconfigure(self.cx1gm_t, state=tk.NORMAL,
+                                       text='G\n' + str(self.caixa_descarte1['peca_grdmet']))
+            self.canvas1.itemconfigure(self.cx1gm, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx1gm_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx1gm, state=tk.HIDDEN)
+
+        #Caixa de descarte2
+        if self.caixa_descarte2['peca_peqnmet'] > 0:
+            self.canvas1.itemconfigure(self.cx2p_t, state=tk.NORMAL, text='P\n'+str(self.caixa_descarte2['peca_peqnmet']))
+            self.canvas1.itemconfigure(self.cx2p, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx2p_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx2p, state=tk.HIDDEN)
+
+        if self.caixa_descarte2['peca_mednmet'] > 0:
+            self.canvas1.itemconfigure(self.cx2m_t, state=tk.NORMAL, text='M\n'+str(self.caixa_descarte2['peca_mednmet']))
+            self.canvas1.itemconfigure(self.cx2m, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx2m_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx2m, state=tk.HIDDEN)
+
+        if self.caixa_descarte2['peca_grdnmet'] > 0:
+            self.canvas1.itemconfigure(self.cx2g_t, state=tk.NORMAL, text='G\n'+str(self.caixa_descarte2['peca_grdnmet']))
+            self.canvas1.itemconfigure(self.cx2g, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx2g_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx2g, state=tk.HIDDEN)
+
+        if self.caixa_descarte2['peca_peqmet'] > 0:
+            self.canvas1.itemconfigure(self.cx2pm_t, state=tk.NORMAL,
+                                       text='P\n' + str(self.caixa_descarte2['peca_peqmet']))
+            self.canvas1.itemconfigure(self.cx2pm, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx2pm_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx2pm, state=tk.HIDDEN)
+
+        if self.caixa_descarte2['peca_medmet'] > 0:
+            self.canvas1.itemconfigure(self.cx2mm_t, state=tk.NORMAL,
+                                       text='M\n' + str(self.caixa_descarte2['peca_medmet']))
+            self.canvas1.itemconfigure(self.cx2mm, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx2mm_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx2mm, state=tk.HIDDEN)
+
+        if self.caixa_descarte2['peca_grdmet'] > 0:
+            self.canvas1.itemconfigure(self.cx2gm_t, state=tk.NORMAL,
+                                       text='G\n' + str(self.caixa_descarte2['peca_grdmet']))
+            self.canvas1.itemconfigure(self.cx2gm, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx2gm_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx2gm, state=tk.HIDDEN)
+
+        # Caixa de descarte 3
+        if self.caixa_descarte3['peca_peqnmet'] > 0:
+            self.canvas1.itemconfigure(self.cx3p_t, state=tk.NORMAL,
+                                       text='P\n' + str(self.caixa_descarte3['peca_peqnmet']))
+            self.canvas1.itemconfigure(self.cx3p, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx3p_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx3p, state=tk.HIDDEN)
+
+        if self.caixa_descarte3['peca_mednmet'] > 0:
+            self.canvas1.itemconfigure(self.cx3m_t, state=tk.NORMAL,
+                                       text='M\n' + str(self.caixa_descarte3['peca_mednmet']))
+            self.canvas1.itemconfigure(self.cx3m, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx3m_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx3m, state=tk.HIDDEN)
+
+        if self.caixa_descarte3['peca_grdnmet'] > 0:
+            self.canvas1.itemconfigure(self.cx3g_t, state=tk.NORMAL,
+                                       text='G\n' + str(self.caixa_descarte3['peca_grdnmet']))
+            self.canvas1.itemconfigure(self.cx3g, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx3g_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx3g, state=tk.HIDDEN)
+
+        if self.caixa_descarte3['peca_peqmet'] > 0:
+            self.canvas1.itemconfigure(self.cx3pm_t, state=tk.NORMAL,
+                                       text='P\n' + str(self.caixa_descarte3['peca_peqmet']))
+            self.canvas1.itemconfigure(self.cx3pm, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx3pm_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx3pm, state=tk.HIDDEN)
+
+        if self.caixa_descarte3['peca_medmet'] > 0:
+            self.canvas1.itemconfigure(self.cx3mm_t, state=tk.NORMAL,
+                                       text='M\n' + str(self.caixa_descarte3['peca_medmet']))
+            self.canvas1.itemconfigure(self.cx3mm, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx3mm_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx3mm, state=tk.HIDDEN)
+
+        if self.caixa_descarte3['peca_grdmet'] > 0:
+            self.canvas1.itemconfigure(self.cx3gm_t, state=tk.NORMAL,
+                                       text='G\n' + str(self.caixa_descarte3['peca_grdmet']))
+            self.canvas1.itemconfigure(self.cx3gm, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx3gm_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx3gm, state=tk.HIDDEN)
+
+        # Caixa de descarte 4
+        if self.caixa_descarte4['peca_peqnmet'] > 0:
+            self.canvas1.itemconfigure(self.cx4p_t, state=tk.NORMAL,
+                                       text='P\n' + str(self.caixa_descarte4['peca_peqnmet']))
+            self.canvas1.itemconfigure(self.cx4p, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx4p_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx4p, state=tk.HIDDEN)
+
+        if self.caixa_descarte4['peca_mednmet'] > 0:
+            self.canvas1.itemconfigure(self.cx4m_t, state=tk.NORMAL,
+                                       text='M\n' + str(self.caixa_descarte4['peca_mednmet']))
+            self.canvas1.itemconfigure(self.cx4m, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx4m_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx4m, state=tk.HIDDEN)
+
+        if self.caixa_descarte4['peca_grdnmet'] > 0:
+            self.canvas1.itemconfigure(self.cx4g_t, state=tk.NORMAL,
+                                       text='G\n' + str(self.caixa_descarte4['peca_grdnmet']))
+            self.canvas1.itemconfigure(self.cx4g, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx4g_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx4g, state=tk.HIDDEN)
+
+        if self.caixa_descarte4['peca_peqmet'] > 0:
+            self.canvas1.itemconfigure(self.cx4pm_t, state=tk.NORMAL,
+                                       text='P\n' + str(self.caixa_descarte4['peca_peqmet']))
+            self.canvas1.itemconfigure(self.cx4pm, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx4pm_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx4pm, state=tk.HIDDEN)
+
+        if self.caixa_descarte4['peca_medmet'] > 0:
+            self.canvas1.itemconfigure(self.cx4mm_t, state=tk.NORMAL,
+                                       text='M\n' + str(self.caixa_descarte4['peca_medmet']))
+            self.canvas1.itemconfigure(self.cx4mm, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx4mm_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx4mm, state=tk.HIDDEN)
+
+        if self.caixa_descarte4['peca_grdmet'] > 0:
+            self.canvas1.itemconfigure(self.cx4gm_t, state=tk.NORMAL,
+                                       text='G\n' + str(self.caixa_descarte4['peca_grdmet']))
+            self.canvas1.itemconfigure(self.cx4gm, state=tk.NORMAL)
+        else:
+            self.canvas1.itemconfigure(self.cx4gm_t, state=tk.HIDDEN)
+            self.canvas1.itemconfigure(self.cx4gm, state=tk.HIDDEN)
 
 
 
-                case 'fc_2':
-                    if self.canvas1.coords(self.moving_img)[0] < 450:
-                        self.canvas1.move(self.moving_img, self.item_dx, 0)
 
-                    else:
-                        if self.canvas1.coords(self.moving_img)[1] < 600:
-                            self.canvas1.move(self.moving_img, 0, self.item_dy)
-                        else:
-                            self.moving_piece_data['moving'] = False
-                            #self.canvas1.itemconfigure(self.moving_img, state=tk.HIDDEN)
-
-                case 'fc_3':
-                    if self.canvas1.coords(self.moving_img)[0] < 450:
-                        self.canvas1.move(self.moving_img, self.item_dx, 0)
-
-                    else:
-                        if self.canvas1.coords(self.moving_img)[1] < 600:
-                            self.canvas1.move(self.moving_img, 0, self.item_dy)
-                        else:
-                            self.moving_piece_data['moving'] = False
-                            Starting_piece_coord = [40, 150]
-                            #self.canvas1.coords(self.moving_img, *Starting_piece_coord)
-                            #self.canvas1.itemconfigure(self.moving_img, state=tk.HIDDEN)
-
-                case 'fc_4':
-                    if self.canvas1.coords(self.moving_img)[0] < 450:
-                        self.canvas1.move(self.moving_img, self.item_dx, 0)
-
-                    else:
-                        if self.canvas1.coords(self.moving_img)[1] < 600:
-                            self.canvas1.move(self.moving_img, 0, self.item_dy)
-                        else:
-                            self.moving_piece_data['moving'] = False
-                            Starting_piece_coord = [40, 150]
-                            #self.canvas1.coords(self.moving_img, *Starting_piece_coord)
-                            #self.canvas1.itemconfigure(self.moving_img, state=tk.HIDDEN)
-                '''
 
 
 if __name__ == "__main__":
