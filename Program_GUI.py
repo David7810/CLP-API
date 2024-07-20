@@ -285,7 +285,7 @@ class aUI:
         labelframe3 = ttk.Labelframe(frame5)
         labelframe3.configure(
             height=200,
-            text='',
+            text='Painel de mensagens',
             width=200)
         self.text1 = tk.Text(labelframe3)
         self.text1.configure(height=10, state="disabled", width=50)
