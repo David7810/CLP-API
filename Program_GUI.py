@@ -270,6 +270,7 @@ class aUI:
         #label10.pack(expand=True, side="top")
         self.button2 = ttk.Button(labelframe4)
         self.button2.configure(text='Iniciar', command=self.iniciar)
+        tk2.bind('<Return>', self.iniciar)
         self.button2.pack(expand=True, side="top")
         self.button3 = ttk.Button(labelframe4)
         self.button3.configure(text='Reprogamar', command=self.reprogramar)
