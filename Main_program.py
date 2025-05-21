@@ -17,11 +17,10 @@ class Mainloop():
         self.enderco_solver = 'https://solver.planning.domains:5001'
         self.package = '/package/lama-first/solve'
 
-        #Instancia o cliente Modbus.
+        #Instancia cliente Modbus.
         self.client = modbus.ModbusTcpClient(ip)
 
-
-        #Dicionario contendo o estado das entradas e saidas digitais do CLP.
+        # Dicionario contendo o estado das entradas e saidas digitais do CLP.
         self.table = {
             'liga_esteira': False,
             'anvanca_ap1': False,
@@ -37,7 +36,11 @@ class Mainloop():
             'peca_mednmet': False,
             'peca_medmet': False,
             'peca_grandnmet': False,
-            'peca_grandmet': False
+            'peca_grandmet': False,
+            'iniciar': False,
+            'parar': False,
+            'reprog': False,
+            'voltar': False
         }
 
         # Enderco das entradas e saidas
@@ -56,14 +59,58 @@ class Mainloop():
             'peca_mednmet': 22,
             'peca_medmet': 23,
             'peca_grdnmet': 24,
-            'peca_grdmet': 25
+            'peca_grdmet': 25,
+            'iniciar': 40,
+            'parar': 41,
+            'reprog': 42,
+            'voltar': 43
+        }
+
+        # Dicionario contendo o estado das entradas e saidas de palavras do CLP.
+        self.mem_words_table = {
+            'quantidade_caixa1_mg': 0,
+            'quantidade_caixa1_mm': 0,
+            'quantidade_caixa1_mp': 0,
+            'quantidade_caixa1_nmg': 0,
+            'quantidade_caixa1_nmm': 0,
+            'quantidade_caixa1_nmp': 0,
+            'quantidade_caixa2_mg': 0,
+            'quantidade_caixa2_mm': 0,
+            'quantidade_caixa2_mp': 0,
+            'quantidade_caixa2_nmg': 0,
+            'quantidade_caixa2_nmm': 0,
+            'quantidade_caixa2_nmp': 0,
+            'quantidade_caixa3_mg': 0,
+            'quantidade_caixa3_mm': 0,
+            'quantidade_caixa3_mp': 0,
+            'quantidade_caixa3_nmg': 0,
+            'quantidade_caixa3_nmm': 0,
+            'quantidade_caixa3_nmp': 0,
+        }
+        # Enderco das palavras de memoria do CLP
+        self.mem_words_addr = {
+            'quantidade_caixa1_mg': 40010,
+            'quantidade_caixa1_mm': 40011,
+            'quantidade_caixa1_mp': 40012,
+            'quantidade_caixa1_nmg': 40013,
+            'quantidade_caixa1_nmm': 40014,
+            'quantidade_caixa1_nmp': 40015,
+            'quantidade_caixa2_mg': 40016,
+            'quantidade_caixa2_mm': 40017,
+            'quantidade_caixa2_mp': 40018,
+            'quantidade_caixa2_nmg': 40019,
+            'quantidade_caixa2_nmm': 40020,
+            'quantidade_caixa2_nmp': 40021,
+            'quantidade_caixa3_mg': 40022,
+            'quantidade_caixa3_mm': 40023,
+            'quantidade_caixa3_mp': 40024,
+            'quantidade_caixa3_nmg': 40025,
+            'quantidade_caixa3_nmm': 40026,
+            'quantidade_caixa3_nmp': 40027,
         }
 
         #Flags de status de funcionamento
         self.running = False
-        self.stop = False
-        self.state = True
-        self.finalizado = False
 
         self.precondition_dict = {}
         self.effect_dict = {}
@@ -86,17 +133,14 @@ class Mainloop():
     def set_table(self, table):
         self.table = table
 
-    def pause(self):
-        self.state = False
-        #self.running = False
+    #def disable(self):
+    #    self.running = False
 
-    def enable(self):
-        self.running = True
+    #def enable(self):
+    #    self.running = True
 
-    def stop1(self):
-        self.stop = True
-
-
+    def setstate(self, state):
+        self.running = state
     def getstate(self):
         return self.running
 
@@ -107,24 +151,23 @@ class Mainloop():
         modbus.write_coil_call(self.client, self.coil_addr['anvanca_ap3'], False)
         modbus.write_coil_call(self.client, self.coil_addr['retrai_ap3'], False)
 
-
-
     def run(self):
-        #Cria o cliente modbus com o ip fornecido.
-        #print(self.client.connected)
+        # Cria o cliente modbus com o ip fornecido.
+        # print(self.client.connected)
         self.client.connect()
+
+        while True:
+            # print(self.client.connected)
+            # while not self.running:
+            while not self.getstate():
+                modbus.read_coil_call(self.client, self.coil_addr['iniciar'])
+                time.sleep(0.5)
+            self.loop()
+
+    def loop(self):
         self.reset()
-
-        #print(self.client.connected)
-
         F1 = False
 
-        #while not self.running:
-        while not self.getstate():
-        #while not self.running:
-            if self.stop:
-                return 0
-            time.sleep(1)
         req_body = {'domain': open('./domain.pddl', 'r').read(),
                     'problem': open('./problem.pddl', 'r').read()}
 
@@ -311,10 +354,9 @@ class Mainloop():
             #Verificamos constantemente as precondicoes que esperamos e as comparamos com as precondicoes necessarias.
             #Quando as precondicoes sao atingidas prosseguimos
             while not precondition_met:
-                if self.stop:
+                if not self.getstate():
                     self.reset()
-                    return 0
-
+                    return
 
                 current_table = {
                     'liga_esteira': modbus.read_coil_call(self.client, self.coil_addr['liga_esteira']),
@@ -347,10 +389,9 @@ class Mainloop():
                 print('-------')
 
             while not effect_met:
-                if self.stop:
-                #if not self.running:
+                if not self.getstate():
                     self.reset()
-                    return 0
+                    return
 
                 if 'liga_esteira' in effect_dict:
                     modbus.write_coil_call(self.client, self.coil_addr['liga_esteira'], effect_dict['liga_esteira'])
@@ -406,12 +447,11 @@ class Mainloop():
                 print(effect_dict)
                 print('-------')
             print("\n-------------------------------------")
-        self.finalizado = True
 
 
 
 if __name__ == "__main__":
 
     app = Mainloop('127.1.1.1')
-    app.running = True
+    #app.running = True
     app.run()
