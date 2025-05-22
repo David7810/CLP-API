@@ -160,7 +160,8 @@ class Mainloop():
             # print(self.client.connected)
             # while not self.running:
             while not self.getstate():
-                modbus.read_coil_call(self.client, self.coil_addr['iniciar'])
+                self.setstate(modbus.read_coil_call(self.client, self.coil_addr['iniciar']))
+                print(self.getstate())
                 time.sleep(0.5)
             self.loop()
 
