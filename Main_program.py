@@ -17,7 +17,7 @@ class Mainloop():
         self.enderco_solver = 'https://solver.planning.domains:5001'
         self.package = '/package/lama-first/solve'
 
-        #Instancia cliente Modbus.
+        #Instancia o cliente Modbus.
         self.client = modbus.ModbusTcpClient(ip)
 
         # Dicionario contendo o estado das entradas e saidas digitais do CLP.
@@ -111,6 +111,9 @@ class Mainloop():
 
         #Flags de status de funcionamento
         self.running = False
+        self.stop = False
+        self.state = True
+        self.finalizado = False
 
         self.precondition_dict = {}
         self.effect_dict = {}
@@ -133,14 +136,17 @@ class Mainloop():
     def set_table(self, table):
         self.table = table
 
-    #def disable(self):
-    #    self.running = False
+    def pause(self):
+        self.state = False
+        #self.running = False
 
-    #def enable(self):
-    #    self.running = True
+    def enable(self):
+        self.running = True
 
-    def setstate(self, state):
-        self.running = state
+    def stop1(self):
+        self.stop = True
+
+
     def getstate(self):
         return self.running
 
@@ -151,24 +157,24 @@ class Mainloop():
         modbus.write_coil_call(self.client, self.coil_addr['anvanca_ap3'], False)
         modbus.write_coil_call(self.client, self.coil_addr['retrai_ap3'], False)
 
+
+
     def run(self):
-        # Cria o cliente modbus com o ip fornecido.
-        # print(self.client.connected)
+        #Cria o cliente modbus com o ip fornecido.
+        #print(self.client.connected)
         self.client.connect()
-
-        while True:
-            # print(self.client.connected)
-            # while not self.running:
-            while not self.getstate():
-                self.setstate(modbus.read_coil_call(self.client, self.coil_addr['iniciar']))
-                print(self.getstate())
-                time.sleep(0.5)
-            self.loop()
-
-    def loop(self):
         self.reset()
+
+        #print(self.client.connected)
+
         F1 = False
 
+        #while not self.running:
+        while not self.getstate():
+        #while not self.running:
+            if self.stop:
+                return 0
+            time.sleep(1)
         req_body = {'domain': open('./domain.pddl', 'r').read(),
                     'problem': open('./problem.pddl', 'r').read()}
 
@@ -355,9 +361,10 @@ class Mainloop():
             #Verificamos constantemente as precondicoes que esperamos e as comparamos com as precondicoes necessarias.
             #Quando as precondicoes sao atingidas prosseguimos
             while not precondition_met:
-                if not self.getstate():
+                if self.stop:
                     self.reset()
-                    return
+                    return 0
+
 
                 current_table = {
                     'liga_esteira': modbus.read_coil_call(self.client, self.coil_addr['liga_esteira']),
@@ -390,9 +397,10 @@ class Mainloop():
                 print('-------')
 
             while not effect_met:
-                if not self.getstate():
+                if self.stop:
+                #if not self.running:
                     self.reset()
-                    return
+                    return 0
 
                 if 'liga_esteira' in effect_dict:
                     modbus.write_coil_call(self.client, self.coil_addr['liga_esteira'], effect_dict['liga_esteira'])
@@ -448,11 +456,12 @@ class Mainloop():
                 print(effect_dict)
                 print('-------')
             print("\n-------------------------------------")
+        self.finalizado = True
 
 
 
 if __name__ == "__main__":
 
     app = Mainloop('127.1.1.1')
-    #app.running = True
+    app.running = True
     app.run()
